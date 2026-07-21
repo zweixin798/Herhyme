@@ -1,0 +1,29 @@
+{
+  "pages": [
+    "pages/welcome/welcome",
+    "pages/today/today",
+    "pages/record/record",
+    "pages/insight/insight",
+    "pages/profile/profile"
+  ],
+  "window": {
+    "navigationBarTitleText": "Her Rhyme",
+    "navigationBarBackgroundColor": "#f7f4eb",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f7f4eb",
+    "backgroundTextStyle": "light"
+  },
+  "tabBar": {
+    "color": "#77776f",
+    "selectedColor": "#536750",
+    "backgroundColor": "#fbfaf5",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/today/today", "text": "今日" },
+      { "pagePath": "pages/record/record", "text": "记录" },
+      { "pagePath": "pages/insight/insight", "text": "洞察" },
+      { "pagePath": "pages/profile/profile", "text": "我的" }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}

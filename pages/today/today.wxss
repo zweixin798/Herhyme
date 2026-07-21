@@ -1,0 +1,16 @@
+.date-label { color: #777970; font-size: 22rpx; }
+.status-card { padding: 30rpx; }
+.status-head { margin-bottom: 20rpx; }
+.status-dot { background: #536750; border-radius: 50%; height: 18rpx; width: 18rpx; }
+.pill-row { margin-bottom: 32rpx; }
+.recommend-title { color: #1e1f1d; font-size: 38rpx; font-weight: 700; margin-bottom: 12rpx; }
+.quick-grid { gap: 20rpx; }
+.quick-card { padding: 26rpx; }
+.quick-label { color: #777970; font-size: 23rpx; }
+.quick-value { color: #1e1f1d; font-size: 34rpx; font-weight: 700; margin-top: 22rpx; }
+.quick-note { color: #777970; font-size: 21rpx; margin-top: 8rpx; }
+.record-cta { display: block; text-align: center; }
+.trend-card { padding: 30rpx; }
+.trend-line { background: #e9e4d9; border-radius: 999rpx; height: 18rpx; margin-top: 30rpx; overflow: hidden; }
+.trend-fill { background: #536750; border-radius: 999rpx; height: 100%; }
+.trend-meta { color: #777970; font-size: 22rpx; margin-top: 14rpx; }

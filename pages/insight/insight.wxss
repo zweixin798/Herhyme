@@ -1,0 +1,6 @@
+.insight-card { padding: 30rpx; }
+.insight-metrics { margin-top: 30rpx; row-gap: 34rpx; }
+.insight-copy { color: #6a6d65; font-size: 28rpx; line-height: 1.7; margin-top: 20rpx; }
+.log-item { padding: 24rpx 28rpx; }
+.log-content { color: #1e1f1d; font-size: 27rpx; line-height: 1.55; margin-top: 12rpx; }
+.empty { padding: 20rpx 0; }

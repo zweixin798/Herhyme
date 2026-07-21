@@ -1,0 +1,7 @@
+.form-card { padding: 30rpx; }
+.field-label { color: #777970; font-size: 23rpx; margin-bottom: 12rpx; }
+.form-card .input, .form-card picker { margin-bottom: 4rpx; }
+.picker-value { background: #fffef9; border: 1rpx solid #ded9cc; border-radius: 18rpx; color: #1e1f1d; height: 88rpx; line-height: 88rpx; padding: 0 24rpx; }
+.form-card button { margin-top: 6rpx; }
+.plan-preview { padding: 30rpx; }
+.metrics { margin-top: 28rpx; row-gap: 32rpx; }

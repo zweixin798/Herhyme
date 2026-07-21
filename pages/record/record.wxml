@@ -1,0 +1,22 @@
+<view class="page stack">
+  <view>
+    <view class="eyebrow">DAILY LOG</view>
+    <view class="title">写下今天的<br/>身体信号。</view>
+    <view class="subtitle record-intro">不需要填很多表，用一句话告诉我今天发生了什么。</view>
+  </view>
+
+  <view class="quick-types">
+    <text wx:for="{{types}}" wx:key="value" class="pill {{activeType === item.value ? 'active' : ''}}" data-type="{{item.value}}" bindtap="selectType">{{item.label}}</text>
+  </view>
+
+  <view class="card record-card">
+    <textarea class="textarea" maxlength="500" placeholder="例如：今天经期第二天，有点痛，昨晚没睡好，但还是想动一动。" value="{{message}}" bindinput="onMessageInput"></textarea>
+    <view class="suggestion">{{prompt}}</view>
+    <button class="button-primary" bindtap="save">保存今天的记录</button>
+  </view>
+
+  <view wx:if="{{saved}}" class="card saved-card">
+    <view class="section-title">已归档</view>
+    <view class="subtitle">这条记录已经写入你的身体地图。记录得越真实，下一次建议就越懂你。</view>
+  </view>
+</view>

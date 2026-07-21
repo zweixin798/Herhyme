@@ -1,0 +1,14 @@
+.DS_Store
+node_modules/
+*.log
+
+# Local configuration and secrets
+.env
+.env.*
+*.pem
+*.key
+*.crt
+project.private.config.json
+
+# Runtime API data
+server/data/store.json

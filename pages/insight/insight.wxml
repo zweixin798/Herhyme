@@ -1,0 +1,28 @@
+<view class="page stack">
+  <view>
+    <view class="eyebrow">BODY INSIGHT</view>
+    <view class="title">你的身体地图<br/>正在形成。</view>
+  </view>
+
+  <view class="card insight-card">
+    <view class="row"><view class="section-title">记录概览</view><view class="accent">{{logs.length}} 条</view></view>
+    <view class="grid-2 insight-metrics">
+      <view><view class="metric-value">{{counts.diet}}</view><view class="metric-label">饮食记录</view></view>
+      <view><view class="metric-value">{{counts.training}}</view><view class="metric-label">训练记录</view></view>
+      <view><view class="metric-value">{{counts.mood}}</view><view class="metric-label">心情记录</view></view>
+      <view><view class="metric-value">{{counts.cycle}}</view><view class="metric-label">经期记录</view></view>
+    </view>
+  </view>
+
+  <view class="card insight-card">
+    <view class="section-title">本周提醒</view>
+    <view class="insight-copy">{{insightText}}</view>
+  </view>
+
+  <view class="section-title">最近记录</view>
+  <view wx:for="{{logs}}" wx:key="createdAt" class="card log-item">
+    <view class="row"><text class="pill">{{item.typeLabel}}</text><text class="muted">{{item.dateLabel}}</text></view>
+    <view class="log-content">{{item.content}}</view>
+  </view>
+  <view wx:if="{{!logs.length}}" class="subtitle empty">还没有记录，从今天开始就好。</view>
+</view>

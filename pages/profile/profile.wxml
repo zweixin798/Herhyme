@@ -1,0 +1,44 @@
+<view class="page stack">
+  <view>
+    <view class="eyebrow">MY BASELINE</view>
+    <view class="title">先建立你的<br/>身体档案。</view>
+  </view>
+
+  <view class="card form-card stack">
+    <view>
+      <view class="field-label">性别</view>
+      <picker range="{{sexOptions}}" value="{{sexIndex}}" bindchange="onSexChange">
+        <view class="picker-value">{{sexOptions[sexIndex]}}</view>
+      </picker>
+    </view>
+    <view class="grid-2">
+      <view><view class="field-label">年龄</view><input class="input" type="number" placeholder="例如 28" value="{{form.age}}" data-key="age" bindinput="onInput" /></view>
+      <view><view class="field-label">身高 cm</view><input class="input" type="number" placeholder="例如 165" value="{{form.height}}" data-key="height" bindinput="onInput" /></view>
+    </view>
+    <view class="grid-2">
+      <view><view class="field-label">当前体重 kg</view><input class="input" type="digit" placeholder="例如 60" value="{{form.weight}}" data-key="weight" bindinput="onInput" /></view>
+      <view><view class="field-label">目标体重 kg</view><input class="input" type="digit" placeholder="例如 55" value="{{form.targetWeight}}" data-key="targetWeight" bindinput="onInput" /></view>
+    </view>
+    <view>
+      <view class="field-label">运动频率</view>
+      <picker range="{{activityOptions}}" value="{{activityIndex}}" bindchange="onActivityChange">
+        <view class="picker-value">{{activityLabels[activityIndex]}}</view>
+      </picker>
+    </view>
+    <view>
+      <view class="field-label">平均周期天数（可选）</view>
+      <input class="input" type="number" placeholder="例如 28" value="{{form.cycleLength}}" data-key="cycleLength" bindinput="onInput" />
+    </view>
+    <button class="button-primary" bindtap="save">生成我的计划</button>
+  </view>
+
+  <view wx:if="{{plan.calories}}" class="card plan-preview">
+    <view class="section-title">你的第一版计划</view>
+    <view class="grid-2 metrics">
+      <view><view class="metric-value">{{plan.calories}}</view><view class="metric-label">每日 kcal</view></view>
+      <view><view class="metric-value">{{plan.protein}}g</view><view class="metric-label">蛋白质</view></view>
+      <view><view class="metric-value">{{plan.carbs}}g</view><view class="metric-label">碳水</view></view>
+      <view><view class="metric-value">{{plan.fat}}g</view><view class="metric-label">脂肪</view></view>
+    </view>
+  </view>
+</view>

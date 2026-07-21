@@ -1,0 +1,128 @@
+page {
+  background: #f7f4eb;
+  color: #1e1f1d;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  font-size: 28rpx;
+}
+
+view, text, button, input, textarea {
+  box-sizing: border-box;
+}
+
+button::after { border: 0; }
+
+.page {
+  min-height: 100vh;
+  padding: 48rpx 40rpx 150rpx;
+}
+
+.eyebrow {
+  color: #536750;
+  font-size: 22rpx;
+  letter-spacing: 3rpx;
+  text-transform: uppercase;
+}
+
+.brand {
+  color: #1e1f1d;
+  font-size: 72rpx;
+  font-weight: 800;
+  letter-spacing: -2rpx;
+  line-height: 1;
+}
+
+.title {
+  color: #1e1f1d;
+  font-size: 54rpx;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.subtitle {
+  color: #6a6d65;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.muted { color: #777970; }
+.accent { color: #536750; }
+
+.card {
+  background: #fffef9;
+  border: 1rpx solid #ded9cc;
+  border-radius: 28rpx;
+  box-shadow: 0 12rpx 28rpx rgba(99, 91, 76, .08);
+}
+
+.button-primary {
+  background: #1e1f1d;
+  border-radius: 999rpx;
+  color: #fffef9;
+  font-size: 28rpx;
+  font-weight: 600;
+  line-height: 92rpx;
+  padding: 0 44rpx;
+}
+
+.button-secondary {
+  background: #ece7da;
+  border-radius: 999rpx;
+  color: #536750;
+  font-size: 26rpx;
+  line-height: 76rpx;
+  padding: 0 34rpx;
+}
+
+.input {
+  background: #fffef9;
+  border: 1rpx solid #ded9cc;
+  border-radius: 18rpx;
+  color: #1e1f1d;
+  font-size: 30rpx;
+  height: 88rpx;
+  padding: 0 24rpx;
+}
+
+.textarea {
+  background: #fffef9;
+  border: 1rpx solid #ded9cc;
+  border-radius: 20rpx;
+  color: #1e1f1d;
+  font-size: 30rpx;
+  line-height: 1.6;
+  min-height: 240rpx;
+  padding: 24rpx;
+  width: 100%;
+}
+
+.section-title {
+  color: #1e1f1d;
+  font-size: 34rpx;
+  font-weight: 700;
+}
+
+.pill {
+  background: #ece7da;
+  border-radius: 999rpx;
+  color: #536750;
+  display: inline-block;
+  font-size: 22rpx;
+  margin: 0 12rpx 12rpx 0;
+  padding: 12rpx 18rpx;
+}
+
+.metric-value {
+  color: #1e1f1d;
+  font-size: 54rpx;
+  font-weight: 700;
+}
+
+.metric-label {
+  color: #777970;
+  font-size: 22rpx;
+  margin-top: 8rpx;
+}
+
+.row { display: flex; align-items: center; justify-content: space-between; }
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20rpx; }
+.stack > * + * { margin-top: 24rpx; }

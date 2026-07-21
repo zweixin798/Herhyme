@@ -1,0 +1,8 @@
+.record-intro { margin-top: 20rpx; }
+.quick-types { margin-top: 10rpx; }
+.quick-types .pill { border: 1rpx solid #ded9cc; }
+.quick-types .pill.active { background: #536750; color: #fffef9; }
+.record-card { padding: 28rpx; }
+.suggestion { color: #777970; font-size: 22rpx; line-height: 1.5; margin: 20rpx 4rpx; }
+.saved-card { padding: 30rpx; }
+.saved-card .subtitle { margin-top: 14rpx; }

@@ -1,0 +1,12 @@
+<view class="page welcome-page">
+  <view class="eyebrow">CYCLE-AWARE FITNESS COMPANION</view>
+  <view class="brand welcome-brand">HER<br/>RHYME</view>
+  <view class="welcome-copy">先懂身体，<br/>再决定怎么动。</view>
+  <view class="subtitle welcome-subtitle">记录你的身体信号，逐步建立属于自己的节律。</view>
+
+  <view class="card welcome-card">
+    <view class="section-title">从今天开始记录</view>
+    <view class="subtitle">先告诉我一些基础信息，我会用它建立你的第一版个人基线。</view>
+    <button class="button-primary" bindtap="start">开始建立档案</button>
+  </view>
+</view>

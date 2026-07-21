@@ -1,0 +1,33 @@
+<view class="page stack">
+  <view class="row">
+    <view>
+      <view class="eyebrow">HER RHYME</view>
+      <view class="title">今天怎么动？</view>
+    </view>
+    <view class="date-label">{{todayLabel}}</view>
+  </view>
+
+  <view class="card status-card">
+    <view class="status-head row"><view class="section-title">今日状态</view><view class="status-dot"></view></view>
+    <view class="pill-row">
+      <text class="pill">{{status.cycle}}</text><text class="pill">{{status.sleep}}</text><text class="pill">{{status.energy}}</text>
+    </view>
+    <view class="recommend-title">{{recommendation.title}}</view>
+    <view class="subtitle">{{recommendation.detail}}</view>
+  </view>
+
+  <view class="grid-2 quick-grid">
+    <navigator class="card quick-card" url="/pages/record/record?type=diet"><view class="quick-label">饮食</view><view class="quick-value">{{plan.calories || '--'}} kcal</view><view class="quick-note">{{plan.protein || '--'}}g 蛋白质</view></navigator>
+    <navigator class="card quick-card" url="/pages/record/record?type=training"><view class="quick-label">训练</view><view class="quick-value">{{trainingLabel}}</view><view class="quick-note">按今天状态调整</view></navigator>
+    <navigator class="card quick-card" url="/pages/record/record?type=mood"><view class="quick-label">心情</view><view class="quick-value">{{latestMood}}</view><view class="quick-note">写下身体感受</view></navigator>
+    <navigator class="card quick-card" url="/pages/record/record?type=cycle"><view class="quick-label">经期</view><view class="quick-value">{{cycleLabel}}</view><view class="quick-note">记录周期信号</view></navigator>
+  </view>
+
+  <navigator class="button-primary record-cta" url="/pages/record/record">用一句话记录今天</navigator>
+
+  <view class="card trend-card">
+    <view class="row"><view class="section-title">本周身体地图</view><navigator class="accent" url="/pages/insight/insight">查看洞察</navigator></view>
+    <view class="trend-line"><view class="trend-fill" style="width: {{trendPercent}}%;"></view></view>
+    <view class="row trend-meta"><text>{{trendText}}</text><text>{{logCount}} 条记录</text></view>
+  </view>
+</view>
