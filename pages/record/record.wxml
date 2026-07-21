@@ -1,7 +1,10 @@
 <view class="page stack">
   <view>
     <view class="eyebrow">DAILY LOG</view>
-    <view class="title">写下今天的<br/>身体信号。</view>
+    <view class="title">
+      <view>写下今天的</view>
+      <view>身体信号。</view>
+    </view>
     <view class="subtitle record-intro">不需要填很多表，用一句话告诉我今天发生了什么。</view>
   </view>
 

@@ -125,4 +125,7 @@ button::after { border: 0; }
 
 .row { display: flex; align-items: center; justify-content: space-between; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20rpx; }
-.stack > * + * { margin-top: 24rpx; }
+.stack > view + view,
+.stack > view + navigator,
+.stack > navigator + view,
+.stack > view + button { margin-top: 24rpx; }

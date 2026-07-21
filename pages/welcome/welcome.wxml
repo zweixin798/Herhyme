@@ -1,7 +1,13 @@
 <view class="page welcome-page">
   <view class="eyebrow">CYCLE-AWARE FITNESS COMPANION</view>
-  <view class="brand welcome-brand">HER<br/>RHYME</view>
-  <view class="welcome-copy">先懂身体，<br/>再决定怎么动。</view>
+  <view class="brand welcome-brand">
+    <view>HER</view>
+    <view>RHYME</view>
+  </view>
+  <view class="welcome-copy">
+    <view>先懂身体，</view>
+    <view>再决定怎么动。</view>
+  </view>
   <view class="subtitle welcome-subtitle">记录你的身体信号，逐步建立属于自己的节律。</view>
 
   <view class="card welcome-card">

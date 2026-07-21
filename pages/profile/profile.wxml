@@ -1,7 +1,10 @@
 <view class="page stack">
   <view>
     <view class="eyebrow">MY BASELINE</view>
-    <view class="title">先建立你的<br/>身体档案。</view>
+    <view class="title">
+      <view>先建立你的</view>
+      <view>身体档案。</view>
+    </view>
   </view>
 
   <view class="card form-card stack">

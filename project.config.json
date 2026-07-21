@@ -9,7 +9,8 @@
     "enhance": true,
     "postcss": true,
     "minified": false,
-    "compileHotReLoad": true
+    "compileHotReLoad": true,
+    "minifyWXML": true
   },
   "compileType": "miniprogram",
   "libVersion": "3.7.3",

@@ -1,7 +1,10 @@
 <view class="page stack">
   <view>
     <view class="eyebrow">BODY INSIGHT</view>
-    <view class="title">你的身体地图<br/>正在形成。</view>
+    <view class="title">
+      <view>你的身体地图</view>
+      <view>正在形成。</view>
+    </view>
   </view>
 
   <view class="card insight-card">
