@@ -1,5 +1,5 @@
-// 开发者工具当前直连腾讯云 IP；真机和正式版需替换为 HTTPS 域名。
-const API_BASE_URL = wx.getStorageSync('herRhymeApiBaseUrl') || 'http://124.220.63.165'
+// 本地调试时仍可通过 Storage 覆盖默认接口地址。
+const API_BASE_URL = wx.getStorageSync('herRhymeApiBaseUrl') || 'https://api.herhyme.site'
 
 function getUserId() {
   let id = wx.getStorageSync('herRhymeUserId')
