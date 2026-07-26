@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/welcome/welcome",
+    "pages/plan/plan",
     "pages/today/today",
     "pages/record/record",
     "pages/insight/insight",
@@ -19,9 +20,9 @@
     "backgroundColor": "#fbfaf5",
     "borderStyle": "white",
     "list": [
+      { "pagePath": "pages/plan/plan", "text": "计划" },
       { "pagePath": "pages/today/today", "text": "今日" },
       { "pagePath": "pages/record/record", "text": "记录" },
-      { "pagePath": "pages/insight/insight", "text": "洞察" },
       { "pagePath": "pages/profile/profile", "text": "我的" }
     ]
   },

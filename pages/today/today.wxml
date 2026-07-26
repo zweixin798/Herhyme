@@ -17,16 +17,43 @@
   </view>
 
   <view class="grid-2 quick-grid">
-    <navigator class="card quick-card" url="/pages/record/record?type=diet"><view class="quick-label">饮食</view><view class="quick-value">{{plan.calories || '--'}} kcal</view><view class="quick-note">{{plan.protein || '--'}}g 蛋白质</view></navigator>
-    <navigator class="card quick-card" url="/pages/record/record?type=training"><view class="quick-label">训练</view><view class="quick-value">{{trainingLabel}}</view><view class="quick-note">按今天状态调整</view></navigator>
-    <navigator class="card quick-card" url="/pages/record/record?type=mood"><view class="quick-label">心情</view><view class="quick-value">{{latestMood}}</view><view class="quick-note">写下身体感受</view></navigator>
-    <navigator class="card quick-card" url="/pages/record/record?type=cycle"><view class="quick-label">经期</view><view class="quick-value">{{cycleLabel}}</view><view class="quick-note">记录周期信号</view></navigator>
+    <view wx:for="{{quickItems}}" wx:key="type" class="card quick-card {{item.wide ? 'quick-wide' : ''}}" data-type="{{item.type}}" bindtap="openRecord">
+      <view class="quick-label">{{item.label}}</view>
+      <view class="quick-value">{{item.value}}</view>
+      <view class="quick-note">{{item.note}}</view>
+    </view>
   </view>
 
-  <navigator class="button-primary record-cta" url="/pages/record/record">用一句话记录今天</navigator>
+  <button class="button-primary record-cta" bindtap="openRecord">用一句话记录今天</button>
+
+  <view class="today-section">
+    <view class="row section-heading">
+      <view class="section-title">今日计划</view>
+      <view class="accent" bindtap="openPlans">{{planProgressText}}</view>
+    </view>
+    <view wx:if="{{activePlans.length}}" class="plan-list">
+      <view wx:for="{{activePlans}}" wx:key="id" class="plan-row" bindtap="openPlans">
+        <view class="plan-check {{item.completedToday ? 'is-complete' : ''}}">{{item.completedToday ? '✓' : ''}}</view>
+        <view class="plan-copy">
+          <view class="plan-name">{{item.name}}</view>
+          <view class="plan-time">{{item.schedule}}</view>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="empty-plan" bindtap="openPlans">从一个简单模板开始安排今天</view>
+  </view>
+
+  <view class="ai-entry" bindtap="openAi">
+    <view class="ai-mark">AI</view>
+    <view class="ai-copy">
+      <view class="ai-title">和 Her Rhyme 聊聊</view>
+      <view class="quick-note">关于状态、训练和恢复的对话入口</view>
+    </view>
+    <view class="ai-state">即将开放</view>
+  </view>
 
   <view class="card trend-card">
-    <view class="row"><view class="section-title">本周身体地图</view><navigator class="accent" url="/pages/insight/insight">查看洞察</navigator></view>
+    <view class="row"><view class="section-title">本周身体地图</view><view class="accent" bindtap="openBodyMap">查看记录</view></view>
     <view class="trend-line"><view class="trend-fill" style="width: {{trendPercent}}%;"></view></view>
     <view class="row trend-meta"><text>{{trendText}}</text><text>{{logCount}} 条记录</text></view>
   </view>

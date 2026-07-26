@@ -54,7 +54,7 @@ function userId(req, body = {}) {
 function calculateInsight(store, id) {
   const logs = store.logs.filter(item => item.user_id === id).sort((a, b) => b.created_at.localeCompare(a.created_at))
   const weights = store.weights.filter(item => item.user_id === id).sort((a, b) => a.date.localeCompare(b.date))
-  const counts = { diet: 0, mood: 0, training: 0, cycle: 0 }
+  const counts = { diet: 0, mood: 0, training: 0, sleep: 0, cycle: 0 }
   logs.forEach(item => { if (counts[item.type] !== undefined) counts[item.type] += 1 })
   const recent = weights.slice(-7)
   const average = recent.length ? Math.round(recent.reduce((sum, item) => sum + Number(item.weight), 0) / recent.length * 10) / 10 : null

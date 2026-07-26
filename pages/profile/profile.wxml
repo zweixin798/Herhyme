@@ -1,47 +1,113 @@
-<view class="page stack">
-  <view>
-    <view class="eyebrow">MY BASELINE</view>
-    <view class="title">
-      <view>先建立你的</view>
-      <view>身体档案。</view>
+<view class="page profile-page">
+  <view class="profile-head row">
+    <view>
+      <view class="eyebrow">MY HER RHYME</view>
+      <view class="title">我的</view>
+    </view>
+    <button wx:if="{{hasProfile && !editing}}" class="small-action" bindtap="startEditing">编辑档案</button>
+  </view>
+
+  <view wx:if="{{hasProfile && !editing}}" class="profile-summary">
+    <view class="row summary-head">
+      <view>
+        <view class="section-title">个人身体档案</view>
+        <view class="profile-status">基线已建立</view>
+      </view>
+      <view class="baseline-dot"></view>
+    </view>
+    <view class="summary-grid">
+      <view class="summary-cell"><view class="summary-number">{{profileSummary.weight}}</view><view class="summary-unit">kg 当前体重</view></view>
+      <view class="summary-cell"><view class="summary-number">{{profileSummary.targetWeight}}</view><view class="summary-unit">kg 目标体重</view></view>
+      <view class="summary-cell summary-cell-last"><view class="summary-number">{{profileSummary.cycleLength}}</view><view class="summary-unit">天 平均周期</view></view>
+    </view>
+    <view class="profile-line">{{profileSummary.age}} 岁 · {{profileSummary.height}} cm · {{profileSummary.activity}}</view>
+  </view>
+
+  <view wx:if="{{editing}}" class="profile-editor">
+    <view class="row editor-heading">
+      <view class="section-title">{{hasProfile ? '编辑身体档案' : '建立身体档案'}}</view>
+      <view wx:if="{{hasProfile}}" class="cancel-link" bindtap="cancelEditing">取消</view>
+    </view>
+    <view class="form-stack">
+      <view>
+        <view class="field-label">性别</view>
+        <picker range="{{sexOptions}}" value="{{sexIndex}}" bindchange="onSexChange">
+          <view class="picker-value">{{sexOptions[sexIndex]}}</view>
+        </picker>
+      </view>
+      <view class="grid-2">
+        <view><view class="field-label">年龄</view><input class="input" type="number" placeholder="例如 28" value="{{form.age}}" data-key="age" bindinput="onInput" /></view>
+        <view><view class="field-label">身高 cm</view><input class="input" type="number" placeholder="例如 165" value="{{form.height}}" data-key="height" bindinput="onInput" /></view>
+      </view>
+      <view class="grid-2">
+        <view><view class="field-label">当前体重 kg</view><input class="input" type="digit" placeholder="例如 60" value="{{form.weight}}" data-key="weight" bindinput="onInput" /></view>
+        <view><view class="field-label">目标体重 kg</view><input class="input" type="digit" placeholder="例如 55" value="{{form.targetWeight}}" data-key="targetWeight" bindinput="onInput" /></view>
+      </view>
+      <view>
+        <view class="field-label">运动频率</view>
+        <picker range="{{activityLabels}}" value="{{activityIndex}}" bindchange="onActivityChange">
+          <view class="picker-value">{{activityLabels[activityIndex]}}</view>
+        </picker>
+      </view>
+      <view>
+        <view class="field-label">平均周期天数（可选）</view>
+        <input class="input" type="number" placeholder="例如 28" value="{{form.cycleLength}}" data-key="cycleLength" bindinput="onInput" />
+      </view>
+      <button class="button-primary save-profile" bindtap="save">保存并更新基线</button>
     </view>
   </view>
 
-  <view class="card form-card stack">
-    <view>
-      <view class="field-label">性别</view>
-      <picker range="{{sexOptions}}" value="{{sexIndex}}" bindchange="onSexChange">
-        <view class="picker-value">{{sexOptions[sexIndex]}}</view>
-      </picker>
-    </view>
-    <view class="grid-2">
-      <view><view class="field-label">年龄</view><input class="input" type="number" placeholder="例如 28" value="{{form.age}}" data-key="age" bindinput="onInput" /></view>
-      <view><view class="field-label">身高 cm</view><input class="input" type="number" placeholder="例如 165" value="{{form.height}}" data-key="height" bindinput="onInput" /></view>
-    </view>
-    <view class="grid-2">
-      <view><view class="field-label">当前体重 kg</view><input class="input" type="digit" placeholder="例如 60" value="{{form.weight}}" data-key="weight" bindinput="onInput" /></view>
-      <view><view class="field-label">目标体重 kg</view><input class="input" type="digit" placeholder="例如 55" value="{{form.targetWeight}}" data-key="targetWeight" bindinput="onInput" /></view>
-    </view>
-    <view>
-      <view class="field-label">运动频率</view>
-      <picker range="{{activityOptions}}" value="{{activityIndex}}" bindchange="onActivityChange">
-        <view class="picker-value">{{activityLabels[activityIndex]}}</view>
-      </picker>
-    </view>
-    <view>
-      <view class="field-label">平均周期天数（可选）</view>
-      <input class="input" type="number" placeholder="例如 28" value="{{form.cycleLength}}" data-key="cycleLength" bindinput="onInput" />
-    </view>
-    <button class="button-primary" bindtap="save">生成我的计划</button>
-  </view>
-
-  <view wx:if="{{plan.calories}}" class="card plan-preview">
-    <view class="section-title">你的第一版计划</view>
-    <view class="grid-2 metrics">
+  <view wx:if="{{plan.calories && !editing}}" class="baseline-section">
+    <view class="section-title">当前营养基线</view>
+    <view class="baseline-grid">
       <view><view class="metric-value">{{plan.calories}}</view><view class="metric-label">每日 kcal</view></view>
       <view><view class="metric-value">{{plan.protein}}g</view><view class="metric-label">蛋白质</view></view>
       <view><view class="metric-value">{{plan.carbs}}g</view><view class="metric-label">碳水</view></view>
       <view><view class="metric-value">{{plan.fat}}g</view><view class="metric-label">脂肪</view></view>
+    </view>
+  </view>
+
+  <view class="memory-section">
+    <view class="row memory-heading">
+      <view>
+        <view class="section-title">Agent 记忆</view>
+        <view class="memory-count">已允许读取 {{enabledMemoryCount}} 条</view>
+      </view>
+      <button class="small-action" bindtap="toggleMemoryEditor">{{showMemoryEditor ? '收起' : '+ 添加'}}</button>
+    </view>
+
+    <view wx:if="{{showMemoryEditor}}" class="memory-editor">
+      <view class="field-label">记忆名称</view>
+      <input class="input" maxlength="30" placeholder="例如：我更喜欢晨练" value="{{memoryForm.title}}" data-key="title" bindinput="onMemoryInput" />
+      <view class="field-label">要记住的内容</view>
+      <textarea class="memory-textarea" maxlength="200" placeholder="写下希望未来 AI 长期参考的信息" value="{{memoryForm.content}}" data-key="content" bindinput="onMemoryInput"></textarea>
+      <button class="button-secondary add-memory" bindtap="addMemory">添加到 Agent 记忆</button>
+    </view>
+
+    <view wx:for="{{memories}}" wx:key="id" class="memory-row">
+      <view class="memory-top row">
+        <view class="memory-title">{{item.title}}</view>
+        <switch checked="{{item.enabled}}" color="#536750" data-id="{{item.id}}" bindchange="toggleMemory" />
+      </view>
+      <view class="memory-content">{{item.content}}</view>
+      <view class="memory-footer row">
+        <view>{{item.source}} · {{item.dateLabel}}</view>
+        <view class="delete-link" data-id="{{item.id}}" bindtap="deleteMemory">删除</view>
+      </view>
+    </view>
+    <view wx:if="{{!memories.length}}" class="empty-memory">暂无长期记忆。未来 AI 只会使用当次对话中的信息。</view>
+    <button wx:if="{{memories.length}}" class="text-button" bindtap="clearMemories">清空全部 Agent 记忆</button>
+  </view>
+
+  <view class="data-section">
+    <view class="section-title">数据管理</view>
+    <view class="data-action" bindtap="deleteProfile">
+      <view><view class="action-title">删除个人档案</view><view class="action-note">保留日常记录和计划</view></view>
+      <view class="action-arrow">›</view>
+    </view>
+    <view class="data-action danger" bindtap="clearAllData">
+      <view><view class="action-title">清除全部本地数据</view><view class="action-note">删除当前设备上的全部 Her Rhyme 数据</view></view>
+      <view class="action-arrow">›</view>
     </view>
   </view>
 </view>

@@ -19,7 +19,7 @@ button::after { border: 0; }
 .eyebrow {
   color: #536750;
   font-size: 22rpx;
-  letter-spacing: 3rpx;
+  letter-spacing: 0;
   text-transform: uppercase;
 }
 
@@ -27,7 +27,7 @@ button::after { border: 0; }
   color: #1e1f1d;
   font-size: 72rpx;
   font-weight: 800;
-  letter-spacing: -2rpx;
+  letter-spacing: 0;
   line-height: 1;
 }
 
@@ -50,7 +50,7 @@ button::after { border: 0; }
 .card {
   background: #fffef9;
   border: 1rpx solid #ded9cc;
-  border-radius: 28rpx;
+  border-radius: 16rpx;
   box-shadow: 0 12rpx 28rpx rgba(99, 91, 76, .08);
 }
 

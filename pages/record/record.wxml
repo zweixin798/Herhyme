@@ -1,25 +1,67 @@
-<view class="page stack">
-  <view>
-    <view class="eyebrow">DAILY LOG</view>
-    <view class="title">
-      <view>写下今天的</view>
-      <view>身体信号。</view>
+<view class="page record-page">
+  <view class="page-head">
+    <view class="eyebrow">BODY LOG</view>
+    <view class="title">记录身体信号</view>
+    <view class="subtitle record-intro">一句话就够了，先留下真实发生的事。</view>
+  </view>
+
+  <scroll-view class="type-scroll" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="quick-types">
+      <text wx:for="{{types}}" wx:key="value" class="pill {{activeType === item.value ? 'active' : ''}}" data-type="{{item.value}}" bindtap="selectType">{{item.label}}</text>
     </view>
-    <view class="subtitle record-intro">不需要填很多表，用一句话告诉我今天发生了什么。</view>
-  </view>
+  </scroll-view>
 
-  <view class="quick-types">
-    <text wx:for="{{types}}" wx:key="value" class="pill {{activeType === item.value ? 'active' : ''}}" data-type="{{item.value}}" bindtap="selectType">{{item.label}}</text>
-  </view>
-
-  <view class="card record-card">
-    <textarea class="textarea" maxlength="500" placeholder="例如：今天经期第二天，有点痛，昨晚没睡好，但还是想动一动。" value="{{message}}" bindinput="onMessageInput"></textarea>
+  <view class="record-editor">
+    <textarea class="textarea" maxlength="500" placeholder="{{placeholder}}" value="{{message}}" bindinput="onMessageInput"></textarea>
     <view class="suggestion">{{prompt}}</view>
-    <button class="button-primary" bindtap="save">保存今天的记录</button>
+    <button class="button-primary save-record" bindtap="save">保存到身体地图</button>
   </view>
 
-  <view wx:if="{{saved}}" class="card saved-card">
-    <view class="section-title">已归档</view>
-    <view class="subtitle">这条记录已经写入你的身体地图。记录得越真实，下一次建议就越懂你。</view>
+  <view wx:if="{{saved}}" class="saved-note">已归档，新的身体信号已经进入当前趋势。</view>
+
+  <view class="map-section">
+    <view class="map-heading row">
+      <view>
+        <view class="section-title">身体地图</view>
+        <view class="range-title">{{rangeTitle}}</view>
+      </view>
+      <view class="range-tabs">
+        <text wx:for="{{ranges}}" wx:key="value" class="range-tab {{activeRange === item.value ? 'active' : ''}}" data-range="{{item.value}}" bindtap="selectRange">{{item.label}}</text>
+      </view>
+    </view>
+
+    <view class="map-summary">
+      <view><text class="summary-value">{{rangeStats.records}}</text><text class="summary-label">条记录</text></view>
+      <view><text class="summary-value">{{rangeStats.activeDays}}</text><text class="summary-label">个活跃日</text></view>
+    </view>
+
+    <view class="chart">
+      <view wx:for="{{chartItems}}" wx:key="key" class="chart-column">
+        <view class="bar-track"><view class="bar-fill" style="height: {{item.height}}%;"></view></view>
+        <view class="bar-label">{{item.label}}</view>
+      </view>
+    </view>
+
+    <view class="category-counts">
+      <view class="count-item"><text>饮食</text><text class="count-number">{{counts.diet}}</text></view>
+      <view class="count-item"><text>训练</text><text class="count-number">{{counts.training}}</text></view>
+      <view class="count-item"><text>睡眠</text><text class="count-number">{{counts.sleep}}</text></view>
+      <view class="count-item"><text>经期</text><text class="count-number">{{counts.cycle}}</text></view>
+      <view class="count-item"><text>心情</text><text class="count-number">{{counts.mood}}</text></view>
+    </view>
+
+    <view class="map-insight">{{rangeInsight}}</view>
+  </view>
+
+  <view class="recent-section">
+    <view class="section-title">最近记录</view>
+    <view wx:for="{{recentLogs}}" wx:key="id" class="log-row">
+      <view class="log-main">
+        <view class="log-meta"><text class="log-type">{{item.typeLabel}}</text><text>{{item.dateLabel}}</text></view>
+        <view class="log-content">{{item.content}}</view>
+      </view>
+      <button class="delete-button" aria-label="删除记录" data-id="{{item.id}}" bindtap="deleteLog">×</button>
+    </view>
+    <view wx:if="{{!recentLogs.length}}" class="empty-records">这个时间范围内还没有记录。</view>
   </view>
 </view>

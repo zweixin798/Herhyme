@@ -4,10 +4,16 @@ App({
   },
 
   onLaunch() {
-    const profile = wx.getStorageSync('herRhymeProfile')
-    if (!profile) {
-      wx.setStorageSync('herRhymeLogs', [])
-      wx.setStorageSync('herRhymeWeightLogs', [])
+    const keys = wx.getStorageInfoSync().keys || []
+    const defaults = {
+      herRhymeLogs: [],
+      herRhymeWeightLogs: [],
+      herRhymePlans: [],
+      herRhymeAgentMemories: []
     }
+
+    Object.keys(defaults).forEach(key => {
+      if (!keys.includes(key)) wx.setStorageSync(key, defaults[key])
+    })
   }
 })

@@ -12,6 +12,7 @@
     <view class="grid-2 insight-metrics">
       <view><view class="metric-value">{{counts.diet}}</view><view class="metric-label">饮食记录</view></view>
       <view><view class="metric-value">{{counts.training}}</view><view class="metric-label">训练记录</view></view>
+      <view><view class="metric-value">{{counts.sleep}}</view><view class="metric-label">睡眠记录</view></view>
       <view><view class="metric-value">{{counts.mood}}</view><view class="metric-label">心情记录</view></view>
       <view><view class="metric-value">{{counts.cycle}}</view><view class="metric-label">经期记录</view></view>
     </view>
