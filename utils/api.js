@@ -18,7 +18,14 @@ function request(path, method = 'GET', data = {}) {
       method,
       data,
       header: { 'X-User-Id': getUserId(), 'content-type': 'application/json' },
-      success: response => response.statusCode >= 200 && response.statusCode < 300 ? resolve(response.data) : reject(new Error(response.data?.message || 'request failed')),
+      success: response => {
+        if (response.statusCode >= 200 && response.statusCode < 300) return resolve(response.data)
+        const payload = response.data || {}
+        const error = new Error(payload.error?.message || payload.message || 'request failed')
+        error.code = payload.error?.code || 'request_failed'
+        error.statusCode = response.statusCode
+        reject(error)
+      },
       fail: reject
     })
   })

@@ -2,11 +2,15 @@ const http = require('http')
 const fs = require('fs')
 const path = require('path')
 const crypto = require('crypto')
+const { ParserError, parseRecordText, validateParsedLog } = require('./llm-parser')
 
 const PORT = Number(process.env.PORT || 3000)
 const HOST = process.env.HOST || '0.0.0.0'
+const PARSE_RATE_LIMIT = Math.max(1, Number(process.env.LLM_PARSE_RATE_LIMIT) || 20)
+const PARSE_RATE_WINDOW_MS = 5 * 60 * 1000
 const dataDir = path.join(__dirname, 'data')
 const storePath = path.join(dataDir, 'store.json')
+const parseRateBuckets = new Map()
 
 fs.mkdirSync(dataDir, { recursive: true })
 
@@ -38,13 +42,35 @@ function send(res, status, payload) {
 function readBody(req) {
   return new Promise((resolve, reject) => {
     let raw = ''
-    req.on('data', chunk => { raw += chunk })
+    let tooLarge = false
+    req.on('data', chunk => {
+      if (tooLarge) return
+      if (raw.length + chunk.length > 32 * 1024) {
+        tooLarge = true
+        return
+      }
+      raw += chunk
+    })
     req.on('end', () => {
+      if (tooLarge) return reject(new ParserError('request body is too large', 413, 'body_too_large'))
       if (!raw) return resolve({})
       try { resolve(JSON.parse(raw)) } catch (error) { reject(error) }
     })
     req.on('error', reject)
   })
+}
+
+function checkParseRateLimit(req) {
+  const forwarded = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim()
+  const address = forwarded || req.socket.remoteAddress || 'unknown'
+  const now = Date.now()
+  const bucket = parseRateBuckets.get(address)
+  if (!bucket || now - bucket.startedAt >= PARSE_RATE_WINDOW_MS) {
+    parseRateBuckets.set(address, { count: 1, startedAt: now })
+    return
+  }
+  if (bucket.count >= PARSE_RATE_LIMIT) throw new ParserError('too many parse requests', 429, 'rate_limited')
+  bucket.count += 1
 }
 
 function userId(req, body = {}) {
@@ -74,6 +100,12 @@ async function handler(req, res) {
     const body = req.method === 'POST' ? await readBody(req) : {}
     const id = userId(req, body)
 
+    if (req.method === 'POST' && url.pathname === '/api/logs/parse') {
+      checkParseRateLimit(req)
+      const result = await parseRecordText(body.content || body.text)
+      return send(res, 200, { ok: true, parsed: result.parsed, provider: result.provider, model: result.model })
+    }
+
     if (req.method === 'POST' && url.pathname === '/api/profile') {
       store.profiles[id] = { ...body, user_id: id, updated_at: new Date().toISOString() }
       writeStore(store)
@@ -85,7 +117,21 @@ async function handler(req, res) {
     }
 
     if (req.method === 'POST' && url.pathname === '/api/logs') {
-      const log = { id: crypto.randomUUID(), user_id: id, type: body.type || 'general', content: String(body.content || ''), created_at: new Date().toISOString() }
+      let parsed = null
+      if (body.parsed !== undefined && body.parsed !== null) {
+        const validation = validateParsedLog(body.parsed)
+        if (!validation.ok) throw new ParserError('parsed log is invalid', 422, 'invalid_parsed_log', { errors: validation.errors })
+        parsed = validation.value
+      }
+      const log = {
+        id: crypto.randomUUID(),
+        user_id: id,
+        type: parsed?.type || body.type || 'general',
+        content: String(body.content || ''),
+        parsed,
+        source: body.source || 'natural_language',
+        created_at: new Date().toISOString()
+      }
       if (!log.content) return send(res, 400, { ok: false, message: 'content is required' })
       store.logs.unshift(log)
       writeStore(store)
@@ -111,7 +157,15 @@ async function handler(req, res) {
 
     return send(res, 404, { ok: false, message: 'not found' })
   } catch (error) {
-    return send(res, 400, { ok: false, message: error.message })
+    const statusCode = error.statusCode || 400
+    return send(res, statusCode, {
+      ok: false,
+      error: {
+        code: error.code || 'request_failed',
+        message: error.message || 'request failed',
+        ...(error.details ? { details: error.details } : {})
+      }
+    })
   }
 }
 

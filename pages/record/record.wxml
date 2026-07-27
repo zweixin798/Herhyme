@@ -2,19 +2,85 @@
   <view class="page-head">
     <view class="eyebrow">BODY LOG</view>
     <view class="title">记录身体信号</view>
-    <view class="subtitle record-intro">一句话就够了，先留下真实发生的事。</view>
+    <view class="subtitle record-intro">用一句话告诉我发生了什么，先由 Her Rhyme 帮你整理。</view>
   </view>
 
-  <scroll-view class="type-scroll" scroll-x enhanced show-scrollbar="{{false}}">
-    <view class="quick-types">
-      <text wx:for="{{types}}" wx:key="value" class="pill {{activeType === item.value ? 'active' : ''}}" data-type="{{item.value}}" bindtap="selectType">{{item.label}}</text>
-    </view>
-  </scroll-view>
-
   <view class="record-editor">
+    <view class="editor-label row">
+      <view class="section-title">自然语言记录</view>
+      <view wx:if="{{parsing}}" class="parsing-state">正在识别</view>
+    </view>
     <textarea class="textarea" maxlength="500" placeholder="{{placeholder}}" value="{{message}}" bindinput="onMessageInput"></textarea>
-    <view class="suggestion">{{prompt}}</view>
-    <button class="button-primary save-record" bindtap="save">保存到身体地图</button>
+    <view class="suggestion">内容会先生成一张可修改的识别卡片，确认后才归档。</view>
+    <button class="button-primary save-record" loading="{{parsing}}" disabled="{{parsing}}" bindtap="save">{{parsing ? '正在识别...' : '识别并继续'}}</button>
+  </view>
+
+  <view wx:if="{{parseError}}" class="parse-error">
+    <view class="parse-error-text">{{parseError}}</view>
+    <view class="parse-error-actions row">
+      <button class="button-secondary" bindtap="retryParse">重新识别</button>
+      <button class="text-button inline-button" bindtap="saveWithoutParsing">直接保存原文</button>
+    </view>
+  </view>
+
+  <view wx:if="{{parsed}}" class="parse-card">
+    <view class="row parse-heading">
+      <view class="section-title">识别结果</view>
+      <text class="parsed-type">{{parsed.typeLabel}}</text>
+    </view>
+    <view class="confirm-question">{{parsePreviewText}}</view>
+
+    <view wx:if="{{parsed.type === 'diet'}}" class="parsed-fields">
+      <view wx:for="{{parsed.diet_items}}" wx:key="index" class="diet-item">
+        <view class="diet-item-head row">
+          <view class="field-caption">食物 {{index + 1}}</view>
+          <button class="remove-item" data-index="{{index}}" bindtap="removeDietItem">删除</button>
+        </view>
+        <input class="compact-input" maxlength="80" placeholder="食物名称" value="{{item.name}}" data-index="{{index}}" data-field="name" bindinput="onDietFieldInput" />
+        <input class="compact-input" maxlength="60" placeholder="分量，例如 2 个" value="{{item.amount}}" data-index="{{index}}" data-field="amount" bindinput="onDietFieldInput" />
+        <view class="diet-number-grid">
+          <input class="compact-input" type="digit" placeholder="热量 kcal" value="{{item.calories_est}}" data-index="{{index}}" data-field="calories_est" bindinput="onDietFieldInput" />
+          <input class="compact-input" type="digit" placeholder="蛋白质 g" value="{{item.protein_est}}" data-index="{{index}}" data-field="protein_est" bindinput="onDietFieldInput" />
+        </view>
+      </view>
+      <button class="button-secondary add-item" bindtap="addDietItem">+ 添加食物</button>
+    </view>
+
+    <view wx:if="{{parsed.type === 'mood'}}" class="parsed-fields">
+      <view class="field-caption">心情</view>
+      <picker range="{{moodLabels}}" value="{{moodIndex}}" bindchange="onMoodChange">
+        <view class="picker-value compact-picker">{{moodLabels[moodIndex]}}</view>
+      </picker>
+    </view>
+
+    <view wx:if="{{parsed.type === 'training'}}" class="parsed-fields">
+      <view class="field-caption">训练项目</view>
+      <input class="compact-input" maxlength="80" value="{{parsed.training.activity}}" placeholder="例如 跑步" data-section="training" data-field="activity" bindinput="onParsedTextInput" />
+      <view class="field-caption">训练时长（分钟）</view>
+      <input class="compact-input" type="digit" value="{{parsed.training.duration_min}}" placeholder="例如 30" data-section="training" data-field="duration_min" bindinput="onParsedInput" />
+    </view>
+
+    <view wx:if="{{parsed.type === 'cycle'}}" class="parsed-fields">
+      <view class="field-caption">周期第几天</view>
+      <input class="compact-input" type="number" value="{{parsed.cycle.day}}" placeholder="例如 2" data-section="cycle" data-field="day" bindinput="onParsedInput" />
+      <view class="field-caption spaced-caption">疼痛程度（0 - 10）</view>
+      <input class="compact-input" type="digit" value="{{parsed.cycle.pain_level}}" placeholder="例如 3" data-section="cycle" data-field="pain_level" bindinput="onParsedInput" />
+      <view class="period-switch row"><text>这是经期开始</text><switch checked="{{parsed.cycle.is_period_start}}" color="#536750" bindchange="onPeriodStartChange" /></view>
+      <view class="field-caption spaced-caption">流量</view>
+      <picker range="{{flowLabels}}" value="{{flowIndex}}" bindchange="onFlowChange">
+        <view class="picker-value compact-picker">{{flowLabels[flowIndex]}}</view>
+      </picker>
+    </view>
+
+    <view wx:if="{{parsed.type === 'sleep'}}" class="parsed-fields">
+      <view class="field-caption">睡眠时长（分钟）</view>
+      <input class="compact-input" type="digit" value="{{parsed.sleep.duration_min}}" placeholder="例如 420" data-section="sleep" data-field="duration_min" bindinput="onParsedInput" />
+    </view>
+
+    <view class="parse-actions">
+      <button class="button-primary" bindtap="confirmParsed">确认并保存</button>
+      <button class="button-secondary" bindtap="retryParse">重新识别</button>
+    </view>
   </view>
 
   <view wx:if="{{saved}}" class="saved-note">已归档，新的身体信号已经进入当前趋势。</view>

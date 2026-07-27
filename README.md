@@ -39,6 +39,23 @@ npm start
 
 健康检查地址：`http://localhost:3000/health`
 
+## 自然语言解析
+
+记录页会把用户原文发送到 `POST /api/logs/parse`，服务端再调用 DeepSeek 或 Qwen 的 OpenAI 兼容接口。模型只能通过 `save_parsed_log` function calling 返回结构化结果，服务端会再次校验类型、字符串长度、热量、蛋白质、训练时长、疼痛等级和周期范围。用户确认或修改后，最终记录通过 `POST /api/logs` 保存到 `log.parsed`。
+
+LLM Key 只配置在服务器环境变量中，不进入小程序代码、Storage 或请求参数。支持的环境变量：
+
+```bash
+LLM_PROVIDER=deepseek
+LLM_API_KEY=your-server-side-key
+LLM_MODEL=deepseek-chat
+LLM_PARSE_RATE_LIMIT=20
+# 可选：自定义 OpenAI 兼容服务地址
+# LLM_BASE_URL=https://api.deepseek.com
+```
+
+切换 Qwen 时使用 `LLM_PROVIDER=qwen`，默认模型为 `qwen-plus`，默认地址为 DashScope 兼容接口。生产环境建议通过 systemd 的 `EnvironmentFile` 注入，并将文件权限设为 `600`。未配置 Key 时，接口返回 `llm_not_configured`，前端可以先保留原文，不影响本地记录。解析端点默认按客户端 IP 限制为 5 分钟 20 次，可用 `LLM_PARSE_RATE_LIMIT` 调整；正式版仍需接入微信登录后的服务端会话鉴权。
+
 ## 服务器常用命令
 
 ```bash
@@ -60,7 +77,7 @@ sudo certbot renew --dry-run
 ## 当前技术边界
 
 - 当前页面仍优先使用本地 Storage，API 服务作为可部署的数据层骨架。
-- 暂无微信登录、云同步和 AI 意图识别，AI 对话入口当前为占位状态。
+- 暂无微信登录、云同步和 AI 对话，AI 对话入口当前为占位状态；自然语言记录解析端点已经完成，但需要服务器配置 LLM Key 才会真正调用模型。
 - Agent 记忆当前由用户在本地手动管理，只有启用的记忆才预留给后续 AI 对话读取。
 - 热量和营养计算在 `utils/calculator.js` 中独立实现。
 - 后续接入远程 API 时，再把 profile、logs、weights 同步到服务端。

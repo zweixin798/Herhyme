@@ -1,14 +1,39 @@
 .record-page { padding-top: 44rpx; }
 .page-head { margin-bottom: 28rpx; }
 .record-intro { margin-top: 14rpx; }
-.type-scroll { margin: 0 -40rpx; padding-left: 40rpx; width: auto; }
-.quick-types { display: flex; padding-right: 40rpx; white-space: nowrap; }
-.quick-types .pill { border: 1rpx solid #ded9cc; flex: 0 0 auto; margin-bottom: 0; }
-.quick-types .pill.active { background: #536750; border-color: #536750; color: #fffef9; }
 .record-editor { border-bottom: 1rpx solid #ded9cc; margin-top: 26rpx; padding-bottom: 42rpx; }
+.editor-label { margin-bottom: 18rpx; }
+.parsing-state { color: #536750; font-size: 22rpx; }
 .record-editor .textarea { min-height: 210rpx; }
 .suggestion { color: #777970; font-size: 22rpx; line-height: 1.5; margin: 18rpx 4rpx 22rpx; }
 .save-record { width: 100%; }
+.parse-error { background: #f3e9e5; border: 1rpx solid #e4ccc5; border-radius: 14rpx; color: #8b4f49; margin-top: 20rpx; padding: 22rpx 24rpx; }
+.parse-error-text { font-size: 24rpx; line-height: 1.5; }
+.parse-error-actions { justify-content: flex-start; margin-top: 14rpx; }
+.parse-error-actions .button-secondary { line-height: 64rpx; }
+.text-button { background: transparent; color: #8b625d; font-size: 23rpx; margin: 0; padding: 0; }
+.inline-button { line-height: 64rpx; margin-left: 24rpx; }
+.parse-card { background: #fffef9; border: 1rpx solid #d8d8c9; border-radius: 16rpx; margin-top: 24rpx; padding: 28rpx; }
+.parse-heading { align-items: center; }
+.parsed-type { background: #e8ebdf; border-radius: 999rpx; color: #536750; font-size: 22rpx; padding: 10rpx 16rpx; }
+.confirm-question { color: #4f5f4d; font-size: 28rpx; line-height: 1.6; margin-top: 22rpx; }
+.parsed-fields { border-top: 1rpx solid #e3ded2; margin-top: 24rpx; padding-top: 24rpx; }
+.field-caption { color: #777970; font-size: 22rpx; margin-bottom: 10rpx; }
+.diet-item { border-bottom: 1rpx solid #ebe7dc; padding: 18rpx 0 24rpx; }
+.diet-item:first-child { padding-top: 0; }
+.diet-item-head { margin-bottom: 12rpx; }
+.remove-item { background: transparent; color: #8b625d; font-size: 22rpx; line-height: 52rpx; margin: 0; padding: 0; }
+.compact-input { background: #f8f6ef; border: 1rpx solid #ded9cc; border-radius: 12rpx; color: #1e1f1d; font-size: 26rpx; height: 76rpx; margin-bottom: 12rpx; padding: 0 18rpx; width: 100%; }
+.diet-number-grid { display: grid; gap: 12rpx; grid-template-columns: 1fr 1fr; }
+.diet-number-grid .compact-input { margin-bottom: 0; }
+.add-item { font-size: 24rpx; line-height: 68rpx; margin-top: 18rpx; width: 100%; }
+.picker-value { background: #f8f6ef; border: 1rpx solid #ded9cc; border-radius: 12rpx; color: #1e1f1d; font-size: 26rpx; height: 76rpx; padding: 0 18rpx; }
+.compact-picker { line-height: 76rpx; }
+.period-switch { border-bottom: 1rpx solid #ebe7dc; color: #4d504a; font-size: 25rpx; margin: 10rpx 0 4rpx; padding: 16rpx 0; }
+.spaced-caption { margin-top: 12rpx; }
+.parse-actions { border-top: 1rpx solid #e3ded2; margin-top: 28rpx; padding-top: 24rpx; }
+.parse-actions .button-primary, .parse-actions .button-secondary { width: 100%; }
+.parse-actions .button-secondary { margin-top: 14rpx; }
 .saved-note { background: #e8ebdf; border-radius: 12rpx; color: #536750; font-size: 23rpx; margin-top: 20rpx; padding: 20rpx 24rpx; }
 .map-section { border-bottom: 1rpx solid #ded9cc; padding: 48rpx 0 42rpx; }
 .map-heading { align-items: flex-end; }

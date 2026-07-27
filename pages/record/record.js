@@ -1,30 +1,19 @@
 const { request } = require('../../utils/api')
 
-const TYPES = [
-  { label: '饮食', value: 'diet' },
-  { label: '训练', value: 'training' },
-  { label: '睡眠', value: 'sleep' },
-  { label: '经期', value: 'cycle' },
-  { label: '心情', value: 'mood' }
-]
-
-const TYPE_LABELS = TYPES.reduce((labels, item) => ({ ...labels, [item.value]: item.label }), {})
-
-const PROMPTS = {
-  diet: '可以写：今天吃了什么、食欲如何，或者有没有特别想吃的东西。',
-  training: '可以写：练了什么、多久，结束后感觉轻松还是疲劳。',
-  sleep: '可以写：几点入睡、睡了多久、夜间是否醒来以及醒来后的感觉。',
-  cycle: '可以写：周期第几天、疼痛、流量或其他身体变化。',
-  mood: '可以写：今天的情绪、压力、动力和身体感受。'
+const TYPE_ORDER = ['diet', 'training', 'sleep', 'cycle', 'mood']
+const TYPE_LABELS = {
+  diet: '饮食',
+  training: '训练',
+  sleep: '睡眠',
+  cycle: '经期',
+  mood: '心情',
+  general: '其他'
 }
 
-const PLACEHOLDERS = {
-  diet: '例如：早餐吃了鸡蛋和全麦面包，午后食欲比较稳定。',
-  training: '例如：完成 30 分钟下肢训练，最后两组有些吃力。',
-  sleep: '例如：昨晚睡了 6 小时，今天醒来有点沉。',
-  cycle: '例如：周期第 2 天，有轻微腹痛，能量比平时低。',
-  mood: '例如：下午有点焦虑，但散步后感觉平静了一些。'
-}
+const MOOD_VALUES = ['', 'happy', 'calm', 'tired', 'stressed', 'low']
+const MOOD_LABELS = ['未识别', '开心', '平静', '疲惫', '压力大', '低落']
+const FLOW_VALUES = ['', 'light', 'medium', 'heavy']
+const FLOW_LABELS = ['未识别', '少量', '中等', '较多']
 
 function startOfDay(date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate())
@@ -39,18 +28,23 @@ function dateKey(date) {
 
 Page({
   data: {
-    types: TYPES,
     ranges: [
       { label: '周', value: 'week' },
       { label: '月', value: 'month' },
       { label: '年', value: 'year' }
     ],
-    activeType: 'diet',
+    moodLabels: MOOD_LABELS,
+    flowLabels: FLOW_LABELS,
     activeRange: 'week',
     message: '',
-    prompt: PROMPTS.diet,
-    placeholder: PLACEHOLDERS.diet,
+    placeholder: '例如：早餐吃了鸡蛋和全麦面包，午后食欲比较稳定。',
     saved: false,
+    parsing: false,
+    parseError: '',
+    parsed: null,
+    parsePreviewText: '',
+    moodIndex: 0,
+    flowIndex: 0,
     counts: { diet: 0, training: 0, sleep: 0, cycle: 0, mood: 0 },
     chartItems: [],
     recentLogs: [],
@@ -59,34 +53,24 @@ Page({
     rangeInsight: '先留下第一条真实记录，身体地图会从这里开始。'
   },
 
-  onLoad(options) {
-    if (options.type && TYPE_LABELS[options.type]) this.selectTypeValue(options.type)
-  },
-
   onShow() {
-    const pendingType = wx.getStorageSync('herRhymePendingRecordType')
-    if (pendingType && TYPE_LABELS[pendingType]) {
-      this.selectTypeValue(pendingType)
-      wx.removeStorageSync('herRhymePendingRecordType')
-    }
+    wx.removeStorageSync('herRhymePendingRecordType')
     this.loadLogs()
   },
 
-  selectType(event) {
-    this.selectTypeValue(event.currentTarget.dataset.type)
-  },
-
-  selectTypeValue(type) {
-    this.setData({ activeType: type, prompt: PROMPTS[type], placeholder: PLACEHOLDERS[type], saved: false })
+  onMessageInput(event) {
+    this.setData({
+      message: event.detail.value,
+      saved: false,
+      parsed: null,
+      parsePreviewText: '',
+      parseError: ''
+    })
   },
 
   selectRange(event) {
     this.setData({ activeRange: event.currentTarget.dataset.range })
     this.loadLogs()
-  },
-
-  onMessageInput(event) {
-    this.setData({ message: event.detail.value, saved: false })
   },
 
   loadLogs() {
@@ -113,10 +97,10 @@ Page({
 
     const chartItems = this.buildChart(rangeLogs, now, this.data.activeRange)
     const activeDays = new Set(rangeLogs.map(item => dateKey(new Date(item.createdAt)))).size
-    const topType = TYPES.slice().sort((a, b) => counts[b.value] - counts[a.value])[0]
+    const topType = TYPE_ORDER.slice().sort((a, b) => counts[b] - counts[a])[0]
     let rangeInsight = '先留下第一条真实记录，身体地图会从这里开始。'
     if (rangeLogs.length > 0 && rangeLogs.length < 5) rangeInsight = '已有一些身体信号，继续记录几天后再判断规律。'
-    if (rangeLogs.length >= 5) rangeInsight = `${topType.label}是这个阶段记录最多的信号，可以结合其他状态一起观察。`
+    if (rangeLogs.length >= 5) rangeInsight = `${TYPE_LABELS[topType]}是这个阶段记录最多的信号，可以结合其他状态一起观察。`
 
     this.setData({
       counts,
@@ -191,21 +175,233 @@ Page({
       wx.showToast({ title: '先写下一点今天的状态', icon: 'none' })
       return
     }
-    const logs = wx.getStorageSync('herRhymeLogs') || []
+    if (this.data.parsing) return
+
+    this.setData({ parsing: true, parseError: '', parsed: null, parsePreviewText: '', saved: false })
+    request('/api/logs/parse', 'POST', { content })
+      .then(payload => {
+        const parsed = this.normalizeParsed(payload.parsed)
+        this.setData({
+          parsing: false,
+          parsed,
+          moodIndex: Math.max(0, MOOD_VALUES.indexOf(parsed.mood)),
+          flowIndex: Math.max(0, FLOW_VALUES.indexOf(parsed.cycle?.flow)),
+          parsePreviewText: this.describeParsed(parsed)
+        })
+      })
+      .catch(error => {
+        this.setData({ parsing: false, parseError: this.parseErrorMessage(error) })
+      })
+  },
+
+  normalizeParsed(input) {
+    const parsed = input && typeof input === 'object' ? { ...input } : {}
+    if (!TYPE_LABELS[parsed.type]) parsed.type = 'general'
+    parsed.typeLabel = TYPE_LABELS[parsed.type]
+    if (parsed.type === 'training') parsed.training = parsed.training || {}
+    if (parsed.type === 'cycle') parsed.cycle = parsed.cycle || {}
+    if (parsed.type === 'sleep') parsed.sleep = parsed.sleep || {}
+    if (parsed.type === 'diet' && !Array.isArray(parsed.diet_items)) parsed.diet_items = []
+    if (Array.isArray(parsed.diet_items)) {
+      parsed.diet_items = parsed.diet_items.map(item => ({
+        name: item.name || '',
+        amount: item.amount || '',
+        calories_est: item.calories_est === undefined ? '' : item.calories_est,
+        protein_est: item.protein_est === undefined ? '' : item.protein_est
+      }))
+    }
+    return parsed
+  },
+
+  describeParsed(parsed) {
+    if (!parsed || !parsed.type) return '没有识别到明确分类，对吗？'
+    if (parsed.type === 'diet') {
+      const items = (parsed.diet_items || []).filter(item => item.name).map(item => `${item.name}${item.amount ? ` ${item.amount}` : ''}`)
+      const calories = (parsed.diet_items || []).reduce((sum, item) => sum + (Number(item.calories_est) || 0), 0)
+      const protein = (parsed.diet_items || []).reduce((sum, item) => sum + (Number(item.protein_est) || 0), 0)
+      const totals = calories ? ` ~${Math.round(calories)}kcal` : ''
+      const proteinText = protein ? `，蛋白质约 ${Math.round(protein)}g` : ''
+      return `识别到：${items.join('、') || '一条饮食记录'}${totals}${proteinText}，对吗？`
+    }
+    if (parsed.type === 'mood') return `识别到：心情为${this.moodLabel(parsed.mood)}，对吗？`
+    if (parsed.type === 'training') {
+      const activity = parsed.training?.activity || '一项训练'
+      const duration = parsed.training?.duration_min ? ` ${parsed.training.duration_min} 分钟` : ''
+      return `识别到：${activity}${duration}，对吗？`
+    }
+    if (parsed.type === 'cycle') {
+      const parts = []
+      if (parsed.cycle?.is_period_start) parts.push('经期开始')
+      if (parsed.cycle?.day) parts.push(`周期第 ${parsed.cycle.day} 天`)
+      if (parsed.cycle?.pain_level !== undefined) parts.push(`疼痛 ${parsed.cycle.pain_level}/10`)
+      if (parsed.cycle?.flow) parts.push(`${parsed.cycle.flow === 'light' ? '少量' : parsed.cycle.flow === 'medium' ? '中等' : '较多'}流量`)
+      return `识别到：${parts.join('，') || '一条经期记录'}，对吗？`
+    }
+    if (parsed.type === 'sleep') {
+      const duration = parsed.sleep?.duration_min ? `${parsed.sleep.duration_min} 分钟` : '睡眠时长'
+      return `识别到：睡眠 ${duration}${parsed.sleep?.quality ? `，质量 ${parsed.sleep.quality}` : ''}，对吗？`
+    }
+    return '识别到一条其他身体记录，对吗？'
+  },
+
+  moodLabel(value) {
+    const index = MOOD_VALUES.indexOf(value)
+    return index >= 0 ? MOOD_LABELS[index] : '未明确'
+  },
+
+  onDietFieldInput(event) {
+    const index = Number(event.currentTarget.dataset.index)
+    const field = event.currentTarget.dataset.field
+    const rawValue = event.detail.value
+    const value = field === 'name' || field === 'amount' ? rawValue : rawValue === '' ? '' : Number(rawValue)
+    this.setData({ [`parsed.diet_items[${index}].${field}`]: value }, () => this.refreshParsedPreview())
+  },
+
+  addDietItem() {
+    const items = (this.data.parsed?.diet_items || []).concat([{ name: '', amount: '', calories_est: '', protein_est: '' }])
+    this.setData({ 'parsed.diet_items': items }, () => this.refreshParsedPreview())
+  },
+
+  removeDietItem(event) {
+    const index = Number(event.currentTarget.dataset.index)
+    const items = (this.data.parsed?.diet_items || []).filter((item, itemIndex) => itemIndex !== index)
+    this.setData({ 'parsed.diet_items': items }, () => this.refreshParsedPreview())
+  },
+
+  onParsedInput(event) {
+    const section = event.currentTarget.dataset.section
+    const field = event.currentTarget.dataset.field
+    const rawValue = event.detail.value
+    const value = rawValue === '' ? '' : Number(rawValue)
+    this.setData({ [`parsed.${section}.${field}`]: value }, () => this.refreshParsedPreview())
+  },
+
+  onParsedTextInput(event) {
+    const section = event.currentTarget.dataset.section
+    const field = event.currentTarget.dataset.field
+    this.setData({ [`parsed.${section}.${field}`]: event.detail.value }, () => this.refreshParsedPreview())
+  },
+
+  onMoodChange(event) {
+    const moodIndex = Number(event.detail.value)
+    const parsed = { ...this.data.parsed }
+    if (MOOD_VALUES[moodIndex]) parsed.mood = MOOD_VALUES[moodIndex]
+    else delete parsed.mood
+    this.setData({ moodIndex, parsed }, () => this.refreshParsedPreview())
+  },
+
+  onFlowChange(event) {
+    const flowIndex = Number(event.detail.value)
+    const parsed = { ...this.data.parsed, cycle: { ...this.data.parsed.cycle } }
+    if (FLOW_VALUES[flowIndex]) parsed.cycle.flow = FLOW_VALUES[flowIndex]
+    else delete parsed.cycle.flow
+    this.setData({ flowIndex, parsed }, () => this.refreshParsedPreview())
+  },
+
+  onPeriodStartChange(event) {
+    this.setData({ 'parsed.cycle.is_period_start': Boolean(event.detail.value) }, () => this.refreshParsedPreview())
+  },
+
+  refreshParsedPreview() {
+    this.setData({ parsePreviewText: this.describeParsed(this.data.parsed) })
+  },
+
+  cleanParsedForSave() {
+    if (!this.data.parsed || this.data.parsed.type === 'general') return null
+    const parsed = JSON.parse(JSON.stringify(this.data.parsed))
+    delete parsed.typeLabel
+    if (parsed.diet_items) {
+      parsed.diet_items = parsed.diet_items.filter(item => String(item.name || '').trim()).map(item => {
+        const cleaned = { name: String(item.name).trim() }
+        if (item.amount) cleaned.amount = String(item.amount).trim()
+        if (item.calories_est !== '' && Number.isFinite(Number(item.calories_est))) cleaned.calories_est = Number(item.calories_est)
+        if (item.protein_est !== '' && Number.isFinite(Number(item.protein_est))) cleaned.protein_est = Number(item.protein_est)
+        return cleaned
+      })
+    }
+    const numericFields = {
+      training: ['duration_min'],
+      cycle: ['day', 'pain_level'],
+      sleep: ['duration_min']
+    }
+    Object.keys(numericFields).forEach(section => {
+      if (!parsed[section]) return
+      numericFields[section].forEach(field => {
+        const value = parsed[section][field]
+        if (value === '' || value === undefined || value === null) delete parsed[section][field]
+        else parsed[section][field] = Number(value)
+      })
+    })
+    if (parsed.training?.activity !== undefined) {
+      parsed.training.activity = String(parsed.training.activity).trim()
+      if (!parsed.training.activity) delete parsed.training.activity
+    }
+    return parsed
+  },
+
+  confirmParsed() {
+    const parsed = this.cleanParsedForSave()
+    if (!parsed) {
+      wx.showToast({ title: '请先重新识别这条记录', icon: 'none' })
+      return
+    }
+    const validationError = this.clientValidationError(parsed)
+    if (validationError) {
+      wx.showToast({ title: validationError, icon: 'none' })
+      return
+    }
+    this.persistLog(parsed)
+  },
+
+  clientValidationError(parsed) {
+    for (const item of parsed.diet_items || []) {
+      if (item.calories_est !== undefined && (!Number.isFinite(item.calories_est) || item.calories_est < 0 || item.calories_est > 5000)) return '单项热量需在 0 - 5000 kcal'
+      if (item.protein_est !== undefined && (!Number.isFinite(item.protein_est) || item.protein_est < 0 || item.protein_est > 500)) return '单项蛋白质需在 0 - 500g'
+    }
+    if (parsed.training?.duration_min !== undefined && (!Number.isFinite(parsed.training.duration_min) || parsed.training.duration_min < 0 || parsed.training.duration_min > 1440)) return '训练时长需在 0 - 1440 分钟'
+    if (parsed.cycle?.day !== undefined && (!Number.isFinite(parsed.cycle.day) || !Number.isInteger(parsed.cycle.day) || parsed.cycle.day < 1 || parsed.cycle.day > 60)) return '周期天数需为 1 - 60 的整数'
+    if (parsed.cycle?.pain_level !== undefined && (!Number.isFinite(parsed.cycle.pain_level) || parsed.cycle.pain_level < 0 || parsed.cycle.pain_level > 10)) return '疼痛程度需在 0 - 10'
+    if (parsed.sleep?.duration_min !== undefined && (!Number.isFinite(parsed.sleep.duration_min) || parsed.sleep.duration_min < 0 || parsed.sleep.duration_min > 1440)) return '睡眠时长需在 0 - 1440 分钟'
+    return ''
+  },
+
+  saveWithoutParsing() {
+    if (!this.data.message.trim()) return
+    this.persistLog(null)
+  },
+
+  persistLog(parsed) {
+    const content = this.data.message.trim()
     const log = {
       id: `log-${Date.now()}-${Math.random().toString(16).slice(2)}`,
-      type: this.data.activeType,
+      type: parsed?.type || 'general',
       content,
-      summary: content.slice(0, 12),
-      source: 'natural_language',
+      summary: parsed ? this.describeParsed(parsed).replace('，对吗？', '') : content.slice(0, 12),
+      parsed: parsed || null,
+      source: parsed ? 'natural_language_llm' : 'natural_language_local',
       createdAt: new Date().toISOString()
     }
+    const logs = wx.getStorageSync('herRhymeLogs') || []
     logs.unshift(log)
     wx.setStorageSync('herRhymeLogs', logs)
     request('/api/logs', 'POST', log).catch(() => {})
-    this.setData({ saved: true, message: '' })
+    this.setData({ saved: true, message: '', parsing: false, parseError: '', parsed: null, parsePreviewText: '' })
     this.loadLogs()
     wx.showToast({ title: '已保存', icon: 'success' })
+  },
+
+  retryParse() {
+    this.setData({ parseError: '' })
+    this.save()
+  },
+
+  parseErrorMessage(error) {
+    if (error?.code === 'llm_not_configured') return '服务器还没有配置 LLM Key，可以先保存原文。'
+    if (error?.code === 'llm_invalid_output') return '模型返回的字段不符合规则，请重新识别或先保存原文。'
+    if (error?.code === 'llm_missing_tool_call') return '这句话包含的状态较多，模型没有完成分类，请重新识别。'
+    if (error?.code === 'llm_timeout') return '解析服务响应超时，可以稍后重试或先保存原文。'
+    if (error?.code === 'rate_limited') return '短时间内识别次数较多，请稍后再试或先保存原文。'
+    return '暂时无法连接解析服务，可以重试或先保存原文。'
   },
 
   deleteLog(event) {
