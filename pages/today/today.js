@@ -1,11 +1,60 @@
+const GREETINGS = [
+  'hi～今天怎么样',
+  '要和luna聊聊吗',
+  '今天身体感觉如何',
+  '慢一点也没关系～'
+]
+
+function startOfDay(date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate())
+}
+
+function daysSince(date, now = new Date()) {
+  const timestamp = new Date(date).getTime()
+  if (!Number.isFinite(timestamp)) return Infinity
+  return Math.floor((startOfDay(now) - startOfDay(new Date(timestamp))) / 86400000)
+}
+
+function latestLog(logs, type) {
+  return logs
+    .filter(item => item.type === type && Number.isFinite(new Date(item.createdAt).getTime()))
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]
+}
+
+function buildRecoveryReminder(logs, now = new Date()) {
+  const training = latestLog(logs, 'training')
+  if (!training) return ''
+
+  const trainingDays = daysSince(training.createdAt, now)
+  if (trainingDays < 0 || trainingDays > 4) return ''
+
+  const activity = training.parsed?.training?.activity || ''
+  const strengthPattern = /力量|抗阻|深蹲|硬拉|卧推|器械|练腿|练背|练胸/
+  const isStrength = strengthPattern.test(activity) || strengthPattern.test(training.content || '')
+  const mood = latestLog(logs, 'mood')
+  const sleep = latestLog(logs, 'sleep')
+  const hasRecoverySignal = (
+    mood && daysSince(mood.createdAt, now) <= 1 && ['tired', 'stressed', 'low'].includes(mood.parsed?.mood)
+  ) || (
+    sleep && daysSince(sleep.createdAt, now) <= 1 && sleep.parsed?.sleep?.quality === 'poor'
+  )
+
+  if (trainingDays > 1 && !isStrength && !hasRecoverySignal) return ''
+  if (trainingDays > 3 && !hasRecoverySignal) return ''
+
+  const when = trainingDays === 0 ? '今天' : trainingDays === 1 ? '昨天' : `${trainingDays} 天前`
+  const activityLabel = isStrength ? '力量训练' : (activity || '训练')
+  return `你${when}刚进行过${activityLabel}，今天注意拉伸和恢复哦～`
+}
+
 Page({
   data: {
     todayLabel: '',
-    plan: {},
-    status: {},
-    recommendation: {},
+    greetingText: GREETINGS[0],
+    greetingIndex: 0,
     quickItems: [],
     activePlans: [],
+    recoveryReminder: '',
     planProgressText: '还没有启用计划',
     trendPercent: 0,
     trendText: '先建立你的个人节律',
@@ -18,7 +67,7 @@ Page({
     const plans = wx.getStorageSync('herRhymePlans') || []
     const cycleLength = profile.cycleLength || 28
     const today = this.dateKey(new Date())
-    const latest = type => logs.find(item => item.type === type)
+    const latest = type => latestLog(logs, type)
     const latestSummary = (type, fallback = '未记录') => latest(type)?.summary || fallback
     const activePlans = plans
       .filter(item => item.enabled)
@@ -30,26 +79,45 @@ Page({
 
     this.setData({
       todayLabel: this.formatDate(new Date()),
-      plan: profile.plan || {},
       logCount: logs.length,
-      status: {
-        cycle: cycleLength ? `周期约 ${cycleLength} 天` : '周期待记录',
-        sleep: latestSummary('sleep', '睡眠待记录'),
-        energy: latestSummary('mood', '状态待记录')
-      },
-      recommendation: { title: logs.length ? '继续听见身体的反馈' : '从一句话记录开始', detail: logs.length ? '今天不需要做完美，只需要留下一个真实的身体信号。' : '记录饮食、训练、睡眠、经期或心情，Her Rhyme 会逐步建立你的个人基线。' },
       quickItems: [
-        { type: 'diet', label: '饮食', value: profile.plan?.calories ? `${profile.plan.calories} kcal` : latestSummary('diet'), note: profile.plan?.protein ? `${profile.plan.protein}g 蛋白质目标` : '记录今天吃了什么' },
-        { type: 'training', label: '训练', value: latestSummary('training'), note: '按今天状态调整' },
-        { type: 'sleep', label: '睡眠', value: latestSummary('sleep'), note: '时长与睡眠感受' },
-        { type: 'mood', label: '心情', value: latestSummary('mood'), note: '写下情绪和能量' },
-        { type: 'cycle', label: '经期', value: latestSummary('cycle'), note: '记录周期信号', wide: true }
+        { type: 'diet', label: '饮食', value: profile.plan?.calories ? `${profile.plan.calories} kcal` : latestSummary('diet') },
+        { type: 'training', label: '训练', value: latestSummary('training') },
+        { type: 'sleep', label: '睡眠', value: latestSummary('sleep') },
+        { type: 'cycle', label: '经期', value: latestSummary('cycle', cycleLength ? `周期约 ${cycleLength} 天` : '未记录') },
+        { type: 'mood', label: '心情', value: latestSummary('mood') }
       ],
       activePlans: activePlans.slice(0, 3),
+      recoveryReminder: buildRecoveryReminder(logs),
       planProgressText: activePlans.length ? `今天完成 ${completedPlans} / ${activePlans.length}` : '还没有启用计划',
       trendPercent: Math.min(100, logs.length * 14),
       trendText: logs.length ? '你的身体地图正在形成' : '先建立你的个人节律'
     })
+    this.startGreetingRotation()
+  },
+
+  onHide() {
+    this.stopGreetingRotation()
+  },
+
+  onUnload() {
+    this.stopGreetingRotation()
+  },
+
+  startGreetingRotation() {
+    this.stopGreetingRotation()
+    const greetingIndex = Math.floor(Date.now() / 5000) % GREETINGS.length
+    this.setData({ greetingIndex, greetingText: GREETINGS[greetingIndex] })
+    this.greetingTimer = setInterval(() => {
+      const nextIndex = (this.data.greetingIndex + 1) % GREETINGS.length
+      this.setData({ greetingIndex: nextIndex, greetingText: GREETINGS[nextIndex] })
+    }, 5000)
+  },
+
+  stopGreetingRotation() {
+    if (!this.greetingTimer) return
+    clearInterval(this.greetingTimer)
+    this.greetingTimer = null
   },
 
   openRecord(event) {
