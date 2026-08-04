@@ -24,6 +24,11 @@
 .plan-item.is-paused { opacity: .46; }
 .plan-top, .template-top { min-height: 50rpx; }
 .category-label { color: #4f705d; font-size: 19rpx; font-weight: 620; }
+.plan-edit-main { padding-bottom: 2rpx; transition: opacity 160ms ease; }
+.plan-edit-main:active { opacity: .66; }
+.plan-name-row { align-items: flex-start; gap: 20rpx; }
+.plan-name-row .plan-name { flex: 1; min-width: 0; }
+.plan-edit-link { color: #4f705d; flex: 0 0 auto; font-size: 20rpx; margin-top: 24rpx; }
 .plan-name { font-size: 33rpx; font-weight: 630; line-height: 1.25; margin-top: 20rpx; }
 .plan-schedule { color: #c06856; font-size: 21rpx; margin-top: 10rpx; }
 .plan-detail { color: #6f7671; font-size: 24rpx; line-height: 1.65; margin-top: 16rpx; }
@@ -36,9 +41,10 @@
 
 .template-section { padding: 42rpx 0 16rpx; }
 .template-list { display: block; }
-.template-item { border-bottom: 1rpx solid #cfd5d0; padding: 28rpx 0 32rpx; }
+.template-item { border-bottom: 1rpx solid #cfd5d0; padding: 28rpx 0 32rpx; transition: background-color 160ms ease, transform 160ms ease; }
+.template-item:active { background: #edf1ed; transform: translateX(4rpx); }
 .template-meta { align-items: center; display: flex; }
 .template-index { color: #9aa19c; font-size: 18rpx; margin-right: 20rpx; }
 .template-action { background: transparent; border: 1rpx solid #78847c; border-radius: 6rpx; color: #31483a; font-size: 20rpx; line-height: 54rpx; margin: 0; padding: 0 18rpx; }
-.template-action.is-added { border-color: transparent; color: #8c938f; }
+.template-action.is-added { border-color: #9eaaa2; color: #4f705d; }
 .safety-note { background: #edf0ed; border-radius: 8rpx; color: #717974; font-size: 20rpx; line-height: 1.65; margin-top: 34rpx; padding: 22rpx 24rpx; }

@@ -10,8 +10,8 @@
   <view wx:if="{{showEditor}}" class="custom-editor">
     <view class="editor-heading row">
       <view>
-        <view class="section-kicker">CREATE</view>
-        <view class="section-title">创建个性计划</view>
+        <view class="section-kicker">{{editorKicker}}</view>
+        <view class="section-title">{{editorTitle}}</view>
       </view>
       <view class="editor-index">01</view>
     </view>
@@ -35,7 +35,7 @@
     <input class="input" maxlength="40" placeholder="例如：周一、三、五 19:00" value="{{customForm.schedule}}" data-key="schedule" bindinput="onCustomInput" />
     <view class="field-label">计划内容</view>
     <textarea class="custom-textarea" maxlength="160" placeholder="写下每天要完成的动作或饮食安排" value="{{customForm.detail}}" data-key="detail" bindinput="onCustomInput"></textarea>
-    <button class="button-primary save-plan" bindtap="saveCustomPlan"><text>保存个性计划</text><text>→</text></button>
+    <button class="button-primary save-plan" bindtap="saveCustomPlan"><text>{{saveLabel}}</text><text>→</text></button>
   </view>
 
   <view class="routine-section">
@@ -53,9 +53,14 @@
           <text class="category-label">{{item.categoryLabel}}</text>
           <switch checked="{{item.enabled}}" color="#4f705d" data-id="{{item.id}}" bindchange="togglePlan" />
         </view>
-        <view class="plan-name">{{item.name}}</view>
-        <view class="plan-schedule">{{item.schedule}}</view>
-        <view class="plan-detail">{{item.detail}}</view>
+        <view class="plan-edit-main" data-id="{{item.id}}" bindtap="openPlanEditor">
+          <view class="plan-name-row row">
+            <view class="plan-name">{{item.name}}</view>
+            <view class="plan-edit-link">修改 →</view>
+          </view>
+          <view class="plan-schedule">{{item.schedule}}</view>
+          <view class="plan-detail">{{item.detail}}</view>
+        </view>
         <view class="plan-actions row">
           <label class="check-label">
             <checkbox value="{{item.id}}" checked="{{item.completedToday}}" disabled="{{!item.enabled}}" color="#4f705d" />
@@ -82,10 +87,10 @@
     </view>
 
     <view class="template-list">
-      <view wx:for="{{templates}}" wx:key="id" wx:for-index="idx" class="template-item">
+      <view wx:for="{{templates}}" wx:key="id" wx:for-index="idx" class="template-item" data-id="{{item.id}}" bindtap="openTemplateEditor">
         <view class="row template-top">
           <view class="template-meta"><text class="template-index">{{idx + 1}}</text><text class="category-label">{{item.categoryLabel}}</text></view>
-          <button class="template-action {{item.added ? 'is-added' : ''}}" disabled="{{item.added}}" data-id="{{item.id}}" bindtap="addTemplate">{{item.added ? '已添加' : '添加 ＋'}}</button>
+          <button class="template-action {{item.added ? 'is-added' : ''}}" data-id="{{item.id}}" catchtap="handleTemplateAction">{{item.added ? '编辑 →' : '添加 ＋'}}</button>
         </view>
         <view class="plan-name">{{item.name}}</view>
         <view class="plan-schedule">{{item.schedule}}</view>
