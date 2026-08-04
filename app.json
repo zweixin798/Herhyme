@@ -9,16 +9,16 @@
   ],
   "window": {
     "navigationBarTitleText": "Her Rhyme",
-    "navigationBarBackgroundColor": "#f7f4eb",
+    "navigationBarBackgroundColor": "#f5f7f4",
     "navigationBarTextStyle": "black",
-    "backgroundColor": "#f7f4eb",
+    "backgroundColor": "#f5f7f4",
     "backgroundTextStyle": "light"
   },
   "tabBar": {
-    "color": "#77776f",
-    "selectedColor": "#536750",
-    "backgroundColor": "#fbfaf5",
-    "borderStyle": "white",
+    "color": "#858c87",
+    "selectedColor": "#171a18",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
     "list": [
       { "pagePath": "pages/plan/plan", "text": "计划" },
       { "pagePath": "pages/today/today", "text": "今日" },

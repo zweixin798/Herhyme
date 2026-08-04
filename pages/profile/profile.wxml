@@ -1,7 +1,7 @@
 <view class="page profile-page">
   <view class="profile-head row">
     <view>
-      <view class="eyebrow">MY HER RHYME</view>
+      <view class="eyebrow">HER RHYME / PROFILE</view>
       <view class="title">我的</view>
     </view>
     <button wx:if="{{hasProfile && !editing}}" class="small-action" bindtap="startEditing">编辑档案</button>
@@ -58,6 +58,7 @@
   </view>
 
   <view wx:if="{{plan.calories && !editing}}" class="baseline-section">
+    <view class="section-kicker">02 · BASELINE</view>
     <view class="section-title">当前营养基线</view>
     <view class="baseline-grid">
       <view><view class="metric-value">{{plan.calories}}</view><view class="metric-label">每日 kcal</view></view>
@@ -70,6 +71,7 @@
   <view class="memory-section">
     <view class="row memory-heading">
       <view>
+        <view class="section-kicker">03 · MEMORY</view>
         <view class="section-title">Agent 记忆</view>
         <view class="memory-count">已允许读取 {{enabledMemoryCount}} 条</view>
       </view>
@@ -103,6 +105,7 @@
     <view class="research-section">
       <view class="row research-heading">
         <view>
+          <view class="section-kicker">04 · RESEARCH</view>
           <view class="section-title">身体数据研究</view>
           <view class="research-count">{{researchSummary.records}} 条记录 · {{researchSummary.corrections}} 次识别修正</view>
         </view>
@@ -123,8 +126,9 @@
         <switch checked="{{includeRawText}}" disabled="{{!researchConsent}}" color="#536750" bindchange="onRawTextConsentChange" />
       </view>
       <view class="research-note">研究数据只在你主动导出后共享。AI 识别会临时发送当前一条文字，但不会自动归档到云端；研究编号不包含微信身份信息。</view>
-      <button class="button-secondary export-button" disabled="{{!researchConsent}}" bindtap="exportResearchData">生成并分享研究数据包</button>
+      <button class="button-secondary export-button" disabled="{{!researchConsent}}" bindtap="exportResearchData"><text>生成并分享研究数据包</text><text>→</text></button>
     </view>
+    <view class="section-kicker data-kicker">05 · DATA</view>
     <view class="section-title">数据管理</view>
     <view class="data-action" bindtap="deleteProfile">
       <view><view class="action-title">删除个人档案</view><view class="action-note">保留日常记录和计划</view></view>

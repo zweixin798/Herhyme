@@ -1,35 +1,66 @@
-<view class="page stack">
-  <view class="row">
+<view class="page today-page">
+  <view class="today-head row">
     <view>
-      <view class="eyebrow">HER RHYME</view>
+      <view class="eyebrow">HER RHYME / DAILY</view>
       <view class="title">今天怎么动？</view>
     </view>
     <view class="date-label">{{todayLabel}}</view>
   </view>
 
-  <view class="card status-card">
-    <view class="status-head row"><view class="section-title">今日状态</view><view class="status-dot"></view></view>
-    <view class="pill-row">
-      <text class="pill">{{status.cycle}}</text><text class="pill">{{status.sleep}}</text><text class="pill">{{status.energy}}</text>
+  <view class="status-section">
+    <view class="status-head row">
+      <view class="section-kicker">01 · NOW</view>
+      <view class="status-live row"><text>今日状态</text><view class="status-dot"></view></view>
     </view>
     <view class="recommend-title">{{recommendation.title}}</view>
-    <view class="subtitle">{{recommendation.detail}}</view>
-  </view>
-
-  <view class="grid-2 quick-grid">
-    <view wx:for="{{quickItems}}" wx:key="type" class="card quick-card {{item.wide ? 'quick-wide' : ''}}" data-type="{{item.type}}" bindtap="openRecord">
-      <view class="quick-label">{{item.label}}</view>
-      <view class="quick-value">{{item.value}}</view>
-      <view class="quick-note">{{item.note}}</view>
+    <view class="subtitle recommend-detail">{{recommendation.detail}}</view>
+    <view class="signal-strip">
+      <view class="signal-cell">
+        <view class="signal-label">周期</view>
+        <view class="signal-value">{{status.cycle}}</view>
+      </view>
+      <view class="signal-cell">
+        <view class="signal-label">睡眠</view>
+        <view class="signal-value">{{status.sleep}}</view>
+      </view>
+      <view class="signal-cell signal-cell-last">
+        <view class="signal-label">状态</view>
+        <view class="signal-value">{{status.energy}}</view>
+      </view>
     </view>
   </view>
 
-  <button class="button-primary record-cta" bindtap="openRecord">用一句话记录今天</button>
+  <view class="quick-section">
+    <view class="section-heading row">
+      <view>
+        <view class="section-kicker">02 · CHECK IN</view>
+        <view class="section-title">今日信号</view>
+      </view>
+      <view class="section-count">05</view>
+    </view>
+    <view class="quick-list">
+      <view wx:for="{{quickItems}}" wx:key="type" wx:for-index="idx" class="quick-row" data-type="{{item.type}}" bindtap="openRecord">
+        <view class="quick-index">{{idx + 1}}</view>
+        <view class="quick-copy">
+          <view class="quick-label">{{item.label}}</view>
+          <view class="quick-value">{{item.value}}</view>
+          <view class="quick-note">{{item.note}}</view>
+        </view>
+        <view class="row-arrow">→</view>
+      </view>
+    </view>
+    <button class="button-primary record-cta" bindtap="openRecord">
+      <text>用一句话记录今天</text><text class="cta-arrow">→</text>
+    </button>
+  </view>
 
   <view class="today-section">
-    <view class="row section-heading">
-      <view class="section-title">今日计划</view>
-      <view class="accent" bindtap="openPlans">{{planProgressText}}</view>
+    <view class="section-heading row">
+      <view>
+        <view class="section-kicker">03 · ROUTINE</view>
+        <view class="section-title">今日计划</view>
+      </view>
+      <view class="section-link" bindtap="openPlans">{{planProgressText}}</view>
     </view>
     <view wx:if="{{activePlans.length}}" class="plan-list">
       <view wx:for="{{activePlans}}" wx:key="id" class="plan-row" bindtap="openPlans">
@@ -38,22 +69,29 @@
           <view class="plan-name">{{item.name}}</view>
           <view class="plan-time">{{item.schedule}}</view>
         </view>
+        <view class="row-arrow">→</view>
       </view>
     </view>
-    <view wx:else class="empty-plan" bindtap="openPlans">从一个简单模板开始安排今天</view>
+    <view wx:else class="empty-plan row" bindtap="openPlans"><text>从一个简单模板开始</text><text>→</text></view>
   </view>
 
   <view class="ai-entry" bindtap="openAi">
-    <view class="ai-mark">AI</view>
-    <view class="ai-copy">
-      <view class="ai-title">和 Her Rhyme 聊聊</view>
-      <view class="quick-note">关于状态、训练和恢复的对话入口</view>
+    <view class="ai-top row">
+      <view class="ai-mark">AI</view>
+      <view class="ai-state">即将开放</view>
     </view>
-    <view class="ai-state">即将开放</view>
+    <view class="ai-title">和 Her Rhyme 聊聊</view>
+    <view class="ai-line"></view>
   </view>
 
-  <view class="card trend-card">
-    <view class="row"><view class="section-title">本周身体地图</view><view class="accent" bindtap="openBodyMap">查看记录</view></view>
+  <view class="trend-section">
+    <view class="row trend-heading">
+      <view>
+        <view class="section-kicker">04 · BODY MAP</view>
+        <view class="section-title">本周身体地图</view>
+      </view>
+      <view class="section-link" bindtap="openBodyMap">查看记录 →</view>
+    </view>
     <view class="trend-line"><view class="trend-fill" style="width: {{trendPercent}}%;"></view></view>
     <view class="row trend-meta"><text>{{trendText}}</text><text>{{logCount}} 条记录</text></view>
   </view>

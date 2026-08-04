@@ -1,18 +1,21 @@
 <view class="page record-page">
   <view class="page-head">
-    <view class="eyebrow">BODY LOG</view>
+    <view class="eyebrow">HER RHYME / BODY LOG</view>
     <view class="title">记录身体信号</view>
     <view class="subtitle record-intro">用一句话告诉我发生了什么，先由 Her Rhyme 帮你整理。</view>
   </view>
 
   <view class="record-editor">
     <view class="editor-label row">
-      <view class="section-title">自然语言记录</view>
+      <view>
+        <view class="section-kicker">01 · INPUT</view>
+        <view class="section-title">自然语言记录</view>
+      </view>
       <view wx:if="{{parsing}}" class="parsing-state">正在识别</view>
     </view>
     <textarea class="textarea" maxlength="500" placeholder="{{placeholder}}" value="{{message}}" bindinput="onMessageInput"></textarea>
     <view class="suggestion">内容会先生成一张可修改的识别卡片，确认后才归档。</view>
-    <button class="button-primary save-record" loading="{{parsing}}" disabled="{{parsing}}" bindtap="save">{{parsing ? '正在识别...' : '识别并继续'}}</button>
+    <button class="button-primary save-record" loading="{{parsing}}" disabled="{{parsing}}" bindtap="save"><text>{{parsing ? '正在识别...' : '识别并继续'}}</text><text wx:if="{{!parsing}}">→</text></button>
   </view>
 
   <view wx:if="{{parseError}}" class="parse-error">
@@ -25,7 +28,7 @@
 
   <view wx:if="{{parsed}}" class="parse-card">
     <view class="row parse-heading">
-      <view class="section-title">识别结果</view>
+      <view><view class="section-kicker">REVIEW</view><view class="section-title">识别结果</view></view>
       <text class="parsed-type">{{parsed.typeLabel}}</text>
     </view>
     <view class="confirm-question">{{parsePreviewText}}</view>
@@ -89,6 +92,7 @@
   <view class="map-section">
     <view class="map-heading row">
       <view>
+        <view class="section-kicker">02 · PATTERN</view>
         <view class="section-title">身体地图</view>
         <view class="range-title">{{rangeTitle}}</view>
       </view>
@@ -121,6 +125,7 @@
   </view>
 
   <view class="recent-section">
+    <view class="section-kicker">03 · ARCHIVE</view>
     <view class="section-title">最近记录</view>
     <view wx:for="{{recentLogs}}" wx:key="id" class="log-row">
       <view class="log-main">

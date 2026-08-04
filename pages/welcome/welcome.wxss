@@ -1,7 +1,16 @@
-.welcome-page { padding-top: 120rpx; }
-.welcome-brand { margin-top: 40rpx; }
-.welcome-copy { color: #536750; font-size: 48rpx; font-weight: 700; line-height: 1.3; margin-top: 48rpx; }
-.welcome-subtitle { margin-top: 22rpx; max-width: 580rpx; }
-.welcome-card { margin-top: 120rpx; padding: 34rpx; }
-.welcome-card .subtitle { margin-top: 18rpx; }
-.welcome-card button { margin-top: 32rpx; }
+.welcome-page { display: flex; flex-direction: column; min-height: 100vh; padding-top: 74rpx; }
+.welcome-top { align-items: center; display: flex; justify-content: space-between; }
+.welcome-index { color: #858c87; font-size: 18rpx; }
+.welcome-brand { font-size: 104rpx; margin-top: 64rpx; }
+.rhythm-line { background: #cfd5d0; height: 1rpx; margin-top: 52rpx; position: relative; width: 100%; }
+.rhythm-fill { animation: line-grow 1s 160ms cubic-bezier(.22, .8, .32, 1) both; background: #4f705d; height: 3rpx; left: 0; position: absolute; top: -1rpx; transform-origin: left; width: 64%; }
+.rhythm-point { animation: quiet-pulse 2.8s ease-in-out infinite; background: #4f705d; border-radius: 50%; height: 10rpx; position: absolute; top: -5rpx; width: 10rpx; }
+.point-one { left: 18%; }
+.point-two { animation-delay: 450ms; left: 45%; }
+.point-three { animation-delay: 900ms; left: 78%; }
+.welcome-copy { color: #26362d; font-size: 43rpx; font-weight: 620; line-height: 1.34; margin-top: 64rpx; }
+.welcome-subtitle { margin-top: 18rpx; max-width: 560rpx; }
+.welcome-start { border-top: 1rpx solid #aeb7b0; margin-top: auto; padding: 34rpx 0 14rpx; }
+.welcome-start .section-title { margin-top: 8rpx; }
+.start-copy { margin-top: 12rpx; }
+.welcome-start button { justify-content: space-between; margin-top: 26rpx; width: 100%; }

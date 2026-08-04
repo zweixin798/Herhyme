@@ -1,27 +1,33 @@
 <view class="page plan-page">
   <view class="page-head row">
     <view>
-      <view class="eyebrow">MY ROUTINE</view>
+      <view class="eyebrow">HER RHYME / ROUTINE</view>
       <view class="title">我的计划</view>
     </view>
-    <button class="add-button" bindtap="toggleEditor">{{showEditor ? '收起' : '+ 自定义'}}</button>
+    <button class="add-button" aria-label="创建个性计划" bindtap="toggleEditor">{{showEditor ? '×' : '＋'}}</button>
   </view>
 
   <view wx:if="{{showEditor}}" class="custom-editor">
-    <view class="section-title">创建个性计划</view>
+    <view class="editor-heading row">
+      <view>
+        <view class="section-kicker">CREATE</view>
+        <view class="section-title">创建个性计划</view>
+      </view>
+      <view class="editor-index">01</view>
+    </view>
     <view class="field-label">计划名称</view>
     <input class="input" maxlength="30" placeholder="例如：经期恢复训练" value="{{customForm.name}}" data-key="name" bindinput="onCustomInput" />
     <view class="form-grid">
       <view>
         <view class="field-label">计划类型</view>
         <picker range="{{categoryOptions}}" value="{{categoryIndex}}" bindchange="onCategoryChange">
-          <view class="picker-value">{{categoryOptions[categoryIndex]}}</view>
+          <view class="picker-value">{{categoryOptions[categoryIndex]}} <text>↓</text></view>
         </picker>
       </view>
       <view>
         <view class="field-label">执行频率</view>
         <picker range="{{cadenceOptions}}" value="{{cadenceIndex}}" bindchange="onCadenceChange">
-          <view class="picker-value">{{cadenceOptions[cadenceIndex]}}</view>
+          <view class="picker-value">{{cadenceOptions[cadenceIndex]}} <text>↓</text></view>
         </picker>
       </view>
     </view>
@@ -29,51 +35,63 @@
     <input class="input" maxlength="40" placeholder="例如：周一、三、五 19:00" value="{{customForm.schedule}}" data-key="schedule" bindinput="onCustomInput" />
     <view class="field-label">计划内容</view>
     <textarea class="custom-textarea" maxlength="160" placeholder="写下每天要完成的动作或饮食安排" value="{{customForm.detail}}" data-key="detail" bindinput="onCustomInput"></textarea>
-    <button class="button-primary save-plan" bindtap="saveCustomPlan">保存个性计划</button>
+    <button class="button-primary save-plan" bindtap="saveCustomPlan"><text>保存个性计划</text><text>→</text></button>
   </view>
 
-  <view class="section-row row">
-    <view class="section-title">我的计划</view>
-    <view class="muted progress-text">{{progressText}}</view>
-  </view>
-
-  <checkbox-group wx:if="{{plans.length}}" bindchange="onCompletionChange">
-    <view wx:for="{{plans}}" wx:key="id" class="card plan-item {{item.enabled ? '' : 'is-paused'}}">
-      <view class="row plan-top">
-        <text class="pill category-pill">{{item.categoryLabel}}</text>
-        <switch checked="{{item.enabled}}" color="#536750" data-id="{{item.id}}" bindchange="togglePlan" />
+  <view class="routine-section">
+    <view class="section-row row">
+      <view>
+        <view class="section-kicker">01 · ACTIVE</view>
+        <view class="section-title">进行中的计划</view>
       </view>
-      <view class="plan-name">{{item.name}}</view>
-      <view class="plan-schedule">{{item.schedule}}</view>
-      <view class="plan-detail">{{item.detail}}</view>
-      <view class="plan-actions row">
-        <label class="check-label">
-          <checkbox value="{{item.id}}" checked="{{item.completedToday}}" disabled="{{!item.enabled}}" color="#536750" />
-          <text>今日完成</text>
-        </label>
-        <button class="icon-button" aria-label="移除计划" data-id="{{item.id}}" catchtap="removePlan">×</button>
+      <view class="progress-text">{{progressText}}</view>
+    </view>
+
+    <checkbox-group wx:if="{{plans.length}}" class="plan-list" bindchange="onCompletionChange">
+      <view wx:for="{{plans}}" wx:key="id" class="plan-item {{item.enabled ? '' : 'is-paused'}}">
+        <view class="row plan-top">
+          <text class="category-label">{{item.categoryLabel}}</text>
+          <switch checked="{{item.enabled}}" color="#4f705d" data-id="{{item.id}}" bindchange="togglePlan" />
+        </view>
+        <view class="plan-name">{{item.name}}</view>
+        <view class="plan-schedule">{{item.schedule}}</view>
+        <view class="plan-detail">{{item.detail}}</view>
+        <view class="plan-actions row">
+          <label class="check-label">
+            <checkbox value="{{item.id}}" checked="{{item.completedToday}}" disabled="{{!item.enabled}}" color="#4f705d" />
+            <text>今日完成</text>
+          </label>
+          <button class="icon-button" aria-label="移除计划" data-id="{{item.id}}" catchtap="removePlan">×</button>
+        </view>
+      </view>
+    </checkbox-group>
+
+    <view wx:else class="empty-state">
+      <view class="empty-title">先选择一项可执行的计划</view>
+      <view class="subtitle">计划不需要很多，能持续完成一项就足够开始。</view>
+    </view>
+  </view>
+
+  <view class="template-section">
+    <view class="section-row row template-heading">
+      <view>
+        <view class="section-kicker">02 · LIBRARY</view>
+        <view class="section-title">计划模板</view>
+      </view>
+      <view class="progress-text">{{templates.length}} 项</view>
+    </view>
+
+    <view class="template-list">
+      <view wx:for="{{templates}}" wx:key="id" wx:for-index="idx" class="template-item">
+        <view class="row template-top">
+          <view class="template-meta"><text class="template-index">{{idx + 1}}</text><text class="category-label">{{item.categoryLabel}}</text></view>
+          <button class="template-action {{item.added ? 'is-added' : ''}}" disabled="{{item.added}}" data-id="{{item.id}}" bindtap="addTemplate">{{item.added ? '已添加' : '添加 ＋'}}</button>
+        </view>
+        <view class="plan-name">{{item.name}}</view>
+        <view class="plan-schedule">{{item.schedule}}</view>
+        <view class="plan-detail">{{item.detail}}</view>
       </view>
     </view>
-  </checkbox-group>
-
-  <view wx:else class="empty-state">
-    <view class="empty-title">先选择一项可执行的计划</view>
-    <view class="subtitle">计划不需要很多，能持续完成一项就足够开始。</view>
-  </view>
-
-  <view class="section-row row template-heading">
-    <view class="section-title">计划模板</view>
-    <view class="muted progress-text">持续补充</view>
-  </view>
-
-  <view wx:for="{{templates}}" wx:key="id" class="card template-item">
-    <view class="row template-top">
-      <text class="pill category-pill">{{item.categoryLabel}}</text>
-      <button class="template-action {{item.added ? 'is-added' : ''}}" disabled="{{item.added}}" data-id="{{item.id}}" bindtap="addTemplate">{{item.added ? '已添加' : '添加'}}</button>
-    </view>
-    <view class="plan-name">{{item.name}}</view>
-    <view class="plan-schedule">{{item.schedule}}</view>
-    <view class="plan-detail">{{item.detail}}</view>
   </view>
 
   <view class="safety-note">16:8 等饮食模板仅用于日程安排。孕期、哺乳期、未成年人或有进食障碍史的人群不建议自行采用。</view>

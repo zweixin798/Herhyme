@@ -1,18 +1,32 @@
 <view class="page welcome-page">
-  <view class="eyebrow">CYCLE-AWARE FITNESS COMPANION</view>
+  <view class="welcome-top">
+    <view class="eyebrow">CYCLE-AWARE FITNESS COMPANION</view>
+    <view class="welcome-index">EST. 2026</view>
+  </view>
   <view class="brand welcome-brand">
     <view>HER</view>
     <view>RHYME</view>
   </view>
+
+  <view class="rhythm-line">
+    <view class="rhythm-fill"></view>
+    <view class="rhythm-point point-one"></view>
+    <view class="rhythm-point point-two"></view>
+    <view class="rhythm-point point-three"></view>
+  </view>
+
   <view class="welcome-copy">
     <view>先懂身体，</view>
     <view>再决定怎么动。</view>
   </view>
   <view class="subtitle welcome-subtitle">记录你的身体信号，逐步建立属于自己的节律。</view>
 
-  <view class="card welcome-card">
-    <view class="section-title">从今天开始记录</view>
-    <view class="subtitle">先告诉我一些基础信息，我会用它建立你的第一版个人基线。</view>
-    <button class="button-primary" bindtap="start">开始建立档案</button>
+  <view class="welcome-start">
+    <view>
+      <view class="section-kicker">START / 01</view>
+      <view class="section-title">从今天开始记录</view>
+    </view>
+    <view class="subtitle start-copy">先建立第一版个人基线。</view>
+    <button class="button-primary" bindtap="start"><text>开始建立档案</text><text>→</text></button>
   </view>
 </view>
