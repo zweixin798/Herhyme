@@ -4,7 +4,7 @@
 .add-button { background: transparent; border: 1rpx solid #9da69f; border-radius: 50%; color: #25332b; font-size: 32rpx; height: 66rpx; line-height: 62rpx; margin: 0; padding: 0; transition: transform 180ms ease; width: 66rpx; }
 .add-button:active { transform: rotate(12deg); }
 
-.custom-editor { background: #e7f3eb; border-radius: 8rpx; margin: 0 0 12rpx; padding: 34rpx 30rpx 40rpx; }
+.custom-editor { background: #e9eee9; border-radius: 8rpx; margin: 0 0 12rpx; padding: 34rpx 30rpx 40rpx; }
 .editor-heading { align-items: flex-start; margin-bottom: 18rpx; }
 .editor-heading .section-title { margin-top: 8rpx; }
 .editor-index { color: #829087; font-size: 21rpx; }
@@ -23,12 +23,12 @@
 .plan-item { background: #ffffff; border-radius: 8rpx; padding: 28rpx; transition: opacity 180ms ease; }
 .plan-item.is-paused { opacity: .46; }
 .plan-top, .template-top { min-height: 50rpx; }
-.category-label { color: #2f7d57; font-size: 19rpx; font-weight: 620; }
+.category-label { color: #687f6e; font-size: 19rpx; font-weight: 620; }
 .plan-edit-main { padding-bottom: 2rpx; transition: opacity 160ms ease; }
 .plan-edit-main:active { opacity: .66; }
 .plan-name-row { align-items: flex-start; gap: 20rpx; }
 .plan-name-row .plan-name { flex: 1; min-width: 0; }
-.plan-edit-link { color: #2f7d57; flex: 0 0 auto; font-size: 20rpx; margin-top: 24rpx; }
+.plan-edit-link { color: #687f6e; flex: 0 0 auto; font-size: 20rpx; margin-top: 24rpx; }
 .plan-name { font-size: 33rpx; font-weight: 630; line-height: 1.25; margin-top: 20rpx; }
 .plan-schedule { color: #c06856; font-size: 21rpx; margin-top: 10rpx; }
 .plan-detail { color: #6f7671; font-size: 24rpx; line-height: 1.65; margin-top: 16rpx; }
@@ -46,5 +46,5 @@
 .template-meta { align-items: center; display: flex; }
 .template-index { color: #9aa19c; font-size: 18rpx; margin-right: 20rpx; }
 .template-action { background: transparent; border: 1rpx solid #78847c; border-radius: 6rpx; color: #31483a; font-size: 20rpx; line-height: 54rpx; margin: 0; padding: 0 18rpx; }
-.template-action.is-added { border-color: #8eb49c; color: #2f7d57; }
+.template-action.is-added { border-color: #a8b7ac; color: #687f6e; }
 .safety-note { background: #edf0ed; border-radius: 8rpx; color: #717974; font-size: 20rpx; line-height: 1.65; margin-top: 34rpx; padding: 22rpx 24rpx; }

@@ -8,11 +8,11 @@
 .insight-metrics > view + view { padding-left: 10rpx; }
 .insight-metrics > view:last-child { border-right: 0; }
 .insight-metrics .metric-value { font-size: 34rpx; }
-.reminder-section { background: #e7f3eb; margin-top: 22rpx; }
-.insight-copy { color: #355e47; font-size: 26rpx; line-height: 1.7; margin-top: 24rpx; max-width: 620rpx; }
+.reminder-section { background: #e9eee9; margin-top: 22rpx; }
+.insight-copy { color: #526a5b; font-size: 26rpx; line-height: 1.7; margin-top: 24rpx; max-width: 620rpx; }
 .log-section { padding-top: 48rpx; }
 .log-section > .section-title { margin-bottom: 20rpx; }
 .log-item { border-top: 1rpx solid #cfd5d0; padding: 24rpx 0 26rpx; }
-.log-type { color: #2f7d57; font-size: 20rpx; font-weight: 600; }
+.log-type { color: #687f6e; font-size: 20rpx; font-weight: 600; }
 .log-content { color: #171a18; font-size: 26rpx; line-height: 1.6; margin-top: 10rpx; }
 .empty { border-top: 1rpx solid #cfd5d0; padding: 30rpx 0; }

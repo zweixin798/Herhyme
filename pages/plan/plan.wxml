@@ -51,7 +51,7 @@
       <view wx:for="{{plans}}" wx:key="id" class="plan-item {{item.enabled ? '' : 'is-paused'}}">
         <view class="row plan-top">
           <text class="category-label">{{item.categoryLabel}}</text>
-          <switch checked="{{item.enabled}}" color="#2f7d57" data-id="{{item.id}}" bindchange="togglePlan" />
+          <switch checked="{{item.enabled}}" color="#687f6e" data-id="{{item.id}}" bindchange="togglePlan" />
         </view>
         <view class="plan-edit-main" data-id="{{item.id}}" bindtap="openPlanEditor">
           <view class="plan-name-row row">
@@ -63,7 +63,7 @@
         </view>
         <view class="plan-actions row">
           <label class="check-label">
-            <checkbox value="{{item.id}}" checked="{{item.completedToday}}" disabled="{{!item.enabled}}" color="#2f7d57" />
+            <checkbox value="{{item.id}}" checked="{{item.completedToday}}" disabled="{{!item.enabled}}" color="#687f6e" />
             <text>今日完成</text>
           </label>
           <button class="icon-button" aria-label="移除计划" data-id="{{item.id}}" catchtap="removePlan">×</button>

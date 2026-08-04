@@ -69,7 +69,7 @@
       <input class="compact-input" type="number" value="{{parsed.cycle.day}}" placeholder="例如 2" data-section="cycle" data-field="day" bindinput="onParsedInput" />
       <view class="field-caption spaced-caption">疼痛程度（0 - 10）</view>
       <input class="compact-input" type="digit" value="{{parsed.cycle.pain_level}}" placeholder="例如 3" data-section="cycle" data-field="pain_level" bindinput="onParsedInput" />
-      <view class="period-switch row"><text>这是经期开始</text><switch checked="{{parsed.cycle.is_period_start}}" color="#2f7d57" bindchange="onPeriodStartChange" /></view>
+      <view class="period-switch row"><text>这是经期开始</text><switch checked="{{parsed.cycle.is_period_start}}" color="#687f6e" bindchange="onPeriodStartChange" /></view>
       <view class="field-caption spaced-caption">流量</view>
       <picker range="{{flowLabels}}" value="{{flowIndex}}" bindchange="onFlowChange">
         <view class="picker-value compact-picker">{{flowLabels[flowIndex]}}</view>

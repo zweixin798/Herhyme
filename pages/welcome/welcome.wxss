@@ -3,8 +3,8 @@
 .welcome-index { color: #858c87; font-size: 18rpx; }
 .welcome-brand { font-size: 104rpx; margin-top: 64rpx; }
 .rhythm-line { background: #cfd5d0; height: 1rpx; margin-top: 52rpx; position: relative; width: 100%; }
-.rhythm-fill { animation: line-grow 1s 160ms cubic-bezier(.22, .8, .32, 1) both; background: #2f7d57; height: 3rpx; left: 0; position: absolute; top: -1rpx; transform-origin: left; width: 64%; }
-.rhythm-point { animation: quiet-pulse 2.8s ease-in-out infinite; background: #2f7d57; border-radius: 50%; height: 10rpx; position: absolute; top: -5rpx; width: 10rpx; }
+.rhythm-fill { animation: line-grow 1s 160ms cubic-bezier(.22, .8, .32, 1) both; background: #687f6e; height: 3rpx; left: 0; position: absolute; top: -1rpx; transform-origin: left; width: 64%; }
+.rhythm-point { animation: quiet-pulse 2.8s ease-in-out infinite; background: #687f6e; border-radius: 50%; height: 10rpx; position: absolute; top: -5rpx; width: 10rpx; }
 .point-one { left: 18%; }
 .point-two { animation-delay: 450ms; left: 45%; }
 .point-three { animation-delay: 900ms; left: 78%; }
