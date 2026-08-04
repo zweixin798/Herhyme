@@ -3,7 +3,7 @@
 .page-head .title { margin-top: 10rpx; }
 .record-intro { margin-top: 16rpx; max-width: 620rpx; }
 
-.record-editor { border-bottom: 1rpx solid #aeb7b0; border-top: 1rpx solid #aeb7b0; padding: 28rpx 0 44rpx; }
+.record-editor { padding: 20rpx 0 40rpx; }
 .editor-label { align-items: flex-end; margin-bottom: 22rpx; }
 .editor-label .section-title { margin-top: 8rpx; }
 .parsing-state { align-items: center; color: #4f705d; display: flex; font-size: 20rpx; }
@@ -19,7 +19,7 @@
 .text-button { background: transparent; color: #9c594f; font-size: 22rpx; margin: 0; padding: 0; }
 .inline-button { line-height: 62rpx; margin-left: 24rpx; }
 
-.parse-card { background: #e5ede7; border-bottom: 1rpx solid #aeb7b0; margin: 0 -36rpx; padding: 34rpx 36rpx 40rpx; }
+.parse-card { background: #e5ede7; border-radius: 8rpx; margin-top: 24rpx; padding: 32rpx 30rpx 36rpx; }
 .parse-heading { align-items: flex-start; }
 .parse-heading .section-title { margin-top: 8rpx; }
 .parsed-type { border-bottom: 1rpx solid #5f7a68; color: #405f4c; font-size: 20rpx; padding: 5rpx 0; }
@@ -44,7 +44,7 @@
 .parse-actions .button-secondary { margin-top: 12rpx; }
 .saved-note { border-bottom: 1rpx solid #b9c8bd; color: #4f705d; font-size: 22rpx; padding: 22rpx 0; }
 
-.map-section { border-bottom: 1rpx solid #aeb7b0; padding: 56rpx 0 50rpx; }
+.map-section { background: #ffffff; border-radius: 8rpx; margin-top: 32rpx; padding: 32rpx 28rpx 36rpx; }
 .map-heading { align-items: flex-end; }
 .map-heading .section-title { margin-top: 8rpx; }
 .range-title { color: #7b827d; font-size: 20rpx; margin-top: 8rpx; }

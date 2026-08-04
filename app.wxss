@@ -82,9 +82,8 @@ button::after { border: 0; }
 .accent { color: #4f705d; }
 
 .card {
-  background: transparent;
-  border-bottom: 1rpx solid #d9ded9;
-  border-radius: 0;
+  background: #ffffff;
+  border-radius: 8rpx;
   box-shadow: none;
 }
 

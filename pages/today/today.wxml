@@ -7,6 +7,15 @@
     <view class="date-label">{{todayLabel}}</view>
   </view>
 
+  <view class="ai-entry" bindtap="openAi">
+    <view class="ai-top row">
+      <view class="ai-mark">L</view>
+      <view class="ai-state">即将开放</view>
+    </view>
+    <view class="ai-title">和 luna 聊聊</view>
+    <view class="ai-arrow">→</view>
+  </view>
+
   <view class="status-section">
     <view class="status-head row">
       <view class="section-kicker">01 · NOW</view>
@@ -73,15 +82,6 @@
       </view>
     </view>
     <view wx:else class="empty-plan row" bindtap="openPlans"><text>从一个简单模板开始</text><text>→</text></view>
-  </view>
-
-  <view class="ai-entry" bindtap="openAi">
-    <view class="ai-top row">
-      <view class="ai-mark">AI</view>
-      <view class="ai-state">即将开放</view>
-    </view>
-    <view class="ai-title">和 Her Rhyme 聊聊</view>
-    <view class="ai-line"></view>
   </view>
 
   <view class="trend-section">

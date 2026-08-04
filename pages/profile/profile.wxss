@@ -3,7 +3,7 @@
 .profile-head .title { margin-top: 10rpx; }
 .small-action { background: transparent; border-bottom: 1rpx solid #6e7972; border-radius: 0; color: #405247; font-size: 21rpx; line-height: 52rpx; margin: 0; padding: 0 2rpx; }
 
-.profile-summary { border-bottom: 1rpx solid #aeb7b0; border-top: 1rpx solid #aeb7b0; padding: 28rpx 0 0; }
+.profile-summary { background: #ffffff; border-radius: 8rpx; overflow: hidden; padding: 28rpx 28rpx 0; }
 .summary-head { align-items: flex-start; }
 .profile-status { color: #4f705d; font-size: 20rpx; margin-top: 8rpx; }
 .baseline-dot { animation: quiet-pulse 2.4s ease-in-out infinite; background: #4f705d; border-radius: 50%; height: 12rpx; width: 12rpx; }
@@ -23,7 +23,7 @@
 .picker-value { align-items: center; border-bottom: 1rpx solid #aeb8b0; color: #171a18; display: flex; font-size: 28rpx; height: 84rpx; padding: 0 2rpx; }
 .save-profile { margin-top: 30rpx; width: 100%; }
 
-.baseline-section { border-bottom: 1rpx solid #aeb7b0; padding: 52rpx 0 46rpx; }
+.baseline-section { background: #ffffff; border-radius: 8rpx; margin-top: 26rpx; padding: 30rpx 28rpx 34rpx; }
 .baseline-section .section-title { margin-top: 8rpx; }
 .baseline-grid { border-top: 1rpx solid #cfd5d0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top: 24rpx; }
 .baseline-grid > view { border-right: 1rpx solid #d9ded9; min-width: 0; padding: 24rpx 12rpx 0 0; }
@@ -31,7 +31,7 @@
 .baseline-grid > view:last-child { border-right: 0; }
 .baseline-grid .metric-value { font-size: 34rpx; overflow-wrap: break-word; }
 
-.memory-section { border-bottom: 1rpx solid #aeb7b0; padding: 50rpx 0 44rpx; }
+.memory-section { padding: 52rpx 0 38rpx; }
 .memory-heading { align-items: flex-end; }
 .memory-heading .section-title { margin-top: 8rpx; }
 .memory-count { color: #7b827d; font-size: 20rpx; margin-top: 8rpx; }
@@ -50,7 +50,7 @@
 .text-button { background: transparent; color: #a65f53; font-size: 21rpx; line-height: 68rpx; margin-top: 10rpx; padding: 0; text-align: left; }
 
 .data-section { padding: 0 0 20rpx; }
-.research-section { border-bottom: 1rpx solid #aeb7b0; padding: 50rpx 0 46rpx; }
+.research-section { background: #ffffff; border-radius: 8rpx; padding: 30rpx 28rpx 34rpx; }
 .research-heading { align-items: flex-start; }
 .research-heading .section-title { margin-top: 8rpx; }
 .research-count { color: #7b827d; font-size: 20rpx; margin-top: 8rpx; }

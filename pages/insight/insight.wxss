@@ -1,16 +1,16 @@
 .insight-page { padding-top: 38rpx; }
 .insight-head { padding-bottom: 42rpx; }
 .insight-head .title { margin-top: 10rpx; }
-.insight-section { border-top: 1rpx solid #aeb7b0; padding: 34rpx 0 44rpx; }
+.insight-section { background: #ffffff; border-radius: 8rpx; padding: 30rpx 28rpx 34rpx; }
 .insight-section .section-title, .log-section .section-title { margin-top: 8rpx; }
 .insight-metrics { border-top: 1rpx solid #d9ded9; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); margin-top: 28rpx; }
 .insight-metrics > view { border-right: 1rpx solid #d9ded9; padding: 24rpx 8rpx 0 0; }
 .insight-metrics > view + view { padding-left: 10rpx; }
 .insight-metrics > view:last-child { border-right: 0; }
 .insight-metrics .metric-value { font-size: 34rpx; }
-.reminder-section { background: #e5ede7; margin: 0 -36rpx; padding: 36rpx; }
+.reminder-section { background: #e5ede7; margin-top: 22rpx; }
 .insight-copy { color: #4e6255; font-size: 26rpx; line-height: 1.7; margin-top: 24rpx; max-width: 620rpx; }
-.log-section { border-top: 1rpx solid #aeb7b0; padding-top: 44rpx; }
+.log-section { padding-top: 48rpx; }
 .log-section > .section-title { margin-bottom: 20rpx; }
 .log-item { border-top: 1rpx solid #cfd5d0; padding: 24rpx 0 26rpx; }
 .log-type { color: #4f705d; font-size: 20rpx; font-weight: 600; }
