@@ -3,6 +3,7 @@
     "pages/welcome/welcome",
     "pages/plan/plan",
     "pages/today/today",
+    "pages/checkin/checkin",
     "pages/record/record",
     "pages/insight/insight",
     "pages/profile/profile"

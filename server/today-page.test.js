@@ -8,6 +8,7 @@ function createTodayPage(storage) {
   global.wx = {
     getStorageSync: key => storage[key],
     setStorageSync: (key, value) => { storage[key] = value },
+    navigateTo: options => { storage.lastNavigation = options },
     switchTab: () => {},
     showToast: () => {}
   }
@@ -46,3 +47,12 @@ test('today page keeps signals compact and derives recovery reminders from recen
   page.onHide()
 })
 
+test('today check-in opens the dedicated natural-language page', () => {
+  const storage = { herRhymeProfile: {}, herRhymePlans: [], herRhymeLogs: [] }
+  const page = createTodayPage(storage)
+
+  page.openRecord({ currentTarget: { dataset: { type: 'sleep' } } })
+
+  assert.equal(storage.herRhymePendingRecordType, 'sleep')
+  assert.deepEqual(storage.lastNavigation, { url: '/pages/checkin/checkin' })
+})

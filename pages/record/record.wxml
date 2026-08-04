@@ -1,100 +1,14 @@
 <view class="page record-page">
   <view class="page-head">
-    <view class="eyebrow">HER RHYME / BODY LOG</view>
-    <view class="title">记录身体信号</view>
-    <view class="subtitle record-intro">用一句话告诉我发生了什么，先由 Her Rhyme 帮你整理。</view>
+    <view class="eyebrow">HER RHYME / BODY MAP</view>
+    <view class="title">身体地图</view>
   </view>
-
-  <view class="record-editor">
-    <view class="editor-label row">
-      <view>
-        <view class="section-kicker">01 · INPUT</view>
-        <view class="section-title">自然语言记录</view>
-      </view>
-      <view wx:if="{{parsing}}" class="parsing-state">正在识别</view>
-    </view>
-    <textarea class="textarea" maxlength="500" placeholder="{{placeholder}}" value="{{message}}" bindinput="onMessageInput"></textarea>
-    <view class="suggestion">内容会先生成一张可修改的识别卡片，确认后才归档。</view>
-    <button class="button-primary save-record" loading="{{parsing}}" disabled="{{parsing}}" bindtap="save"><text>{{parsing ? '正在识别...' : '识别并继续'}}</text><text wx:if="{{!parsing}}">→</text></button>
-  </view>
-
-  <view wx:if="{{parseError}}" class="parse-error">
-    <view class="parse-error-text">{{parseError}}</view>
-    <view class="parse-error-actions row">
-      <button class="button-secondary" bindtap="retryParse">重新识别</button>
-      <button class="text-button inline-button" bindtap="saveWithoutParsing">直接保存原文</button>
-    </view>
-  </view>
-
-  <view wx:if="{{parsed}}" class="parse-card">
-    <view class="row parse-heading">
-      <view><view class="section-kicker">REVIEW</view><view class="section-title">识别结果</view></view>
-      <text class="parsed-type">{{parsed.typeLabel}}</text>
-    </view>
-    <view class="confirm-question">{{parsePreviewText}}</view>
-    <view wx:if="{{parseNoticeText}}" class="parse-notice">{{parseNoticeText}}</view>
-
-    <view wx:if="{{parsed.type === 'diet'}}" class="parsed-fields">
-      <view wx:for="{{parsed.diet_items}}" wx:key="index" class="diet-item">
-        <view class="diet-item-head row">
-          <view class="field-caption">食物 {{index + 1}}</view>
-          <button class="remove-item" data-index="{{index}}" bindtap="removeDietItem">删除</button>
-        </view>
-        <input class="compact-input" maxlength="80" placeholder="食物名称" value="{{item.name}}" data-index="{{index}}" data-field="name" bindinput="onDietFieldInput" />
-        <input class="compact-input" maxlength="60" placeholder="分量，例如 2 个" value="{{item.amount}}" data-index="{{index}}" data-field="amount" bindinput="onDietFieldInput" />
-        <view class="diet-number-grid">
-          <input class="compact-input" type="digit" placeholder="热量 kcal" value="{{item.calories_est}}" data-index="{{index}}" data-field="calories_est" bindinput="onDietFieldInput" />
-          <input class="compact-input" type="digit" placeholder="蛋白质 g" value="{{item.protein_est}}" data-index="{{index}}" data-field="protein_est" bindinput="onDietFieldInput" />
-        </view>
-      </view>
-      <button class="button-secondary add-item" bindtap="addDietItem">+ 添加食物</button>
-    </view>
-
-    <view wx:if="{{parsed.type === 'mood'}}" class="parsed-fields">
-      <view class="field-caption">心情</view>
-      <picker range="{{moodLabels}}" value="{{moodIndex}}" bindchange="onMoodChange">
-        <view class="picker-value compact-picker">{{moodLabels[moodIndex]}}</view>
-      </picker>
-    </view>
-
-    <view wx:if="{{parsed.type === 'training'}}" class="parsed-fields">
-      <view class="field-caption">训练项目</view>
-      <input class="compact-input" maxlength="80" value="{{parsed.training.activity}}" placeholder="例如 跑步" data-section="training" data-field="activity" bindinput="onParsedTextInput" />
-      <view class="field-caption">训练时长（分钟）</view>
-      <input class="compact-input" type="digit" value="{{parsed.training.duration_min}}" placeholder="例如 30" data-section="training" data-field="duration_min" bindinput="onParsedInput" />
-    </view>
-
-    <view wx:if="{{parsed.type === 'cycle'}}" class="parsed-fields">
-      <view class="field-caption">周期第几天</view>
-      <input class="compact-input" type="number" value="{{parsed.cycle.day}}" placeholder="例如 2" data-section="cycle" data-field="day" bindinput="onParsedInput" />
-      <view class="field-caption spaced-caption">疼痛程度（0 - 10）</view>
-      <input class="compact-input" type="digit" value="{{parsed.cycle.pain_level}}" placeholder="例如 3" data-section="cycle" data-field="pain_level" bindinput="onParsedInput" />
-      <view class="period-switch row"><text>这是经期开始</text><switch checked="{{parsed.cycle.is_period_start}}" color="#536750" bindchange="onPeriodStartChange" /></view>
-      <view class="field-caption spaced-caption">流量</view>
-      <picker range="{{flowLabels}}" value="{{flowIndex}}" bindchange="onFlowChange">
-        <view class="picker-value compact-picker">{{flowLabels[flowIndex]}}</view>
-      </picker>
-    </view>
-
-    <view wx:if="{{parsed.type === 'sleep'}}" class="parsed-fields">
-      <view class="field-caption">睡眠时长（分钟）</view>
-      <input class="compact-input" type="digit" value="{{parsed.sleep.duration_min}}" placeholder="例如 420" data-section="sleep" data-field="duration_min" bindinput="onParsedInput" />
-    </view>
-
-    <view class="parse-actions">
-      <button class="button-primary" bindtap="confirmParsed">确认并保存</button>
-      <button class="button-secondary" bindtap="retryParse">重新识别</button>
-    </view>
-  </view>
-
-  <view wx:if="{{saved}}" class="saved-note">已归档，新的身体信号已经进入当前趋势。</view>
 
   <view class="map-section">
     <view class="map-heading row">
       <view>
-        <view class="section-kicker">02 · PATTERN</view>
-        <view class="section-title">身体地图</view>
-        <view class="range-title">{{rangeTitle}}</view>
+        <view class="section-kicker">01 · RHYTHM</view>
+        <view class="section-title">{{rangeTitle}}</view>
       </view>
       <view class="range-tabs">
         <text wx:for="{{ranges}}" wx:key="value" class="range-tab {{activeRange === item.value ? 'active' : ''}}" data-range="{{item.value}}" bindtap="selectRange">{{item.label}}</text>
@@ -124,16 +38,45 @@
     <view class="map-insight">{{rangeInsight}}</view>
   </view>
 
-  <view class="recent-section">
-    <view class="section-kicker">03 · ARCHIVE</view>
-    <view class="section-title">最近记录</view>
-    <view wx:for="{{recentLogs}}" wx:key="id" class="log-row">
-      <view class="log-main">
-        <view class="log-meta"><text class="log-type">{{item.typeLabel}}</text><text>{{item.dateLabel}}</text></view>
-        <view class="log-content">{{item.content}}</view>
+  <view class="trend-section">
+    <view class="section-heading row">
+      <view>
+        <view class="section-kicker">02 · RECENT TRENDS</view>
+        <view class="section-title">近期趋势</view>
       </view>
-      <button class="delete-button" aria-label="删除记录" data-id="{{item.id}}" bindtap="deleteLog">×</button>
+      <view class="trend-window">近 7 天</view>
     </view>
-    <view wx:if="{{!recentLogs.length}}" class="empty-records">这个时间范围内还没有记录。</view>
+
+    <view class="recovery-panel {{recovery.tone}}">
+      <view class="recovery-label">{{recovery.label}}</view>
+      <view class="recovery-status">{{recovery.status}}</view>
+      <view class="recovery-summary">{{recovery.summary}}</view>
+    </view>
+
+    <view class="signal-list">
+      <view wx:for="{{trendSignals}}" wx:key="key" class="signal-row">
+        <view class="signal-label">{{item.label}}</view>
+        <view class="signal-copy">
+          <view class="signal-value">{{item.value}}</view>
+          <view class="signal-detail">{{item.detail}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="quality-row">
+      <view class="quality-item"><view class="quality-label">记录完整度</view><view class="quality-value">{{completenessText}}</view></view>
+      <view class="quality-item"><view class="quality-label">信号覆盖</view><view class="quality-value">{{coverageText}}</view></view>
+    </view>
+  </view>
+
+  <view class="advice-section">
+    <view class="section-kicker">03 · FOR YOU</view>
+    <view class="section-title">身体建议</view>
+    <view class="advice-list">
+      <view wx:for="{{recommendations}}" wx:key="*this" class="advice-row">
+        <view class="advice-index">{{index + 1}}</view>
+        <view class="advice-copy">{{item}}</view>
+      </view>
+    </view>
   </view>
 </view>

@@ -79,7 +79,7 @@ button::after { border: 0; }
 }
 
 .muted { color: #7b827d; }
-.accent { color: #4f705d; }
+.accent { color: #2f7d57; }
 
 .card {
   background: #ffffff;
@@ -115,7 +115,7 @@ button::after { border: 0; }
   background: transparent;
   border: 1rpx solid #aeb6b0;
   border-radius: 8rpx;
-  color: #34483c;
+  color: #245e43;
   font-size: 25rpx;
   line-height: 74rpx;
   min-height: 74rpx;
@@ -158,7 +158,7 @@ button::after { border: 0; }
   background: transparent;
   border: 0;
   border-radius: 0;
-  color: #567161;
+  color: #2f7d57;
   display: inline-block;
   font-size: 20rpx;
   font-weight: 600;

@@ -123,7 +123,7 @@ Page({
   openRecord(event) {
     const type = event.currentTarget.dataset.type || ''
     if (type) wx.setStorageSync('herRhymePendingRecordType', type)
-    wx.switchTab({ url: '/pages/record/record' })
+    wx.navigateTo({ url: '/pages/checkin/checkin' })
   },
 
   openBodyMap() {
