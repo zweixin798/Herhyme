@@ -41,7 +41,15 @@ npm start
 
 ## 自然语言解析
 
-记录页会把用户原文发送到 `POST /api/logs/parse`，服务端再调用 DeepSeek 或 Qwen 的 OpenAI 兼容接口。模型只能通过 `save_parsed_log` function calling 返回结构化结果，服务端会再次校验类型、字符串长度、热量、蛋白质、训练时长、疼痛等级和周期范围。用户确认或修改后，最终记录通过 `POST /api/logs` 保存到 `log.parsed`。
+记录页会把当前这一条文字发送到 `POST /api/logs/parse`，服务端再调用 DeepSeek 或 Qwen 的 OpenAI 兼容接口。模型只能通过 `save_parsed_log` function calling 返回结构化结果，服务端会再次校验类型、字符串长度、热量、蛋白质、训练时长、疼痛等级和周期范围，并运行确定性规则。用户确认或修改后，最终记录先保存在本地 `herRhymeLogs`，不会在备案前自动写入服务器。
+
+当前解析链路是：
+
+```text
+自然语言 -> function calling -> 服务端校验 -> 规则评估 -> 前端确认/修改 -> 本地归档 -> 反馈留存
+```
+
+这不是只调提示词。提示词负责提取意图，function schema 负责输出形状，服务端校验负责拒绝越界值，规则负责缺失字段和安全信号，用户确认负责纠正模型，反馈数据用于后续评测。当前 MVP 每句话只归档一个主意图；一句话拆成多个身体事件并路由多个专项 Agent，见 `docs/body-memory.md` 的后续阶段。
 
 LLM Key 只配置在服务器环境变量中，不进入小程序代码、Storage 或请求参数。支持的环境变量：
 
@@ -55,6 +63,12 @@ LLM_PARSE_RATE_LIMIT=20
 ```
 
 切换 Qwen 时使用 `LLM_PROVIDER=qwen`，默认模型为 `qwen-plus`，默认地址为 DashScope 兼容接口。生产环境建议通过 systemd 的 `EnvironmentFile` 注入，并将文件权限设为 `600`。未配置 Key 时，接口返回 `llm_not_configured`，前端可以先保留原文，不影响本地记录。解析端点默认按客户端 IP 限制为 5 分钟 20 次，可用 `LLM_PARSE_RATE_LIMIT` 调整；正式版仍需接入微信登录后的服务端会话鉴权。
+
+## 备案前研究采集
+
+在“我的 -> 身体数据研究”中，用户可以明确开启研究导出。默认导出包不包含原始自然语言，只包含去标识编号、身体档案、结构化身体事件、每日快照、基线成熟度和解析纠错反馈；“同时包含记录原文”是单独的第二个开关。研究数据包只会在用户主动生成并分享后离开设备，适合先做小范围访谈和真实记录测试。
+
+研究数据契约和窗口定义见 [`docs/body-memory.md`](docs/body-memory.md)。
 
 ## 服务器常用命令
 
@@ -72,7 +86,9 @@ sudo certbot renew --dry-run
 
 ## 远程 API
 
-默认 API 地址为 `https://api.herhyme.site`。开发者工具调试时可通过 Storage 中的 `herRhymeApiBaseUrl` 临时覆盖。正式发布前，需要在微信公众平台把 `https://api.herhyme.site` 配置为 request 合法域名。
+开发者工具中的 `develop` 环境默认调用 `https://124.220.63.165`，用于内部演示和解析联调；因为 IP 证书不能作为正式合法域名，这条通道不适合收集真实敏感数据。体验版与正式版默认使用 `https://api.herhyme.site`，备案和证书完成后，再在微信公众平台把它配置为 request 合法域名。
+
+本地调试时仍可通过 Storage 中的 `herRhymeApiBaseUrl` 临时覆盖地址。
 
 ## 当前技术边界
 
@@ -80,4 +96,4 @@ sudo certbot renew --dry-run
 - 暂无微信登录、云同步和 AI 对话，AI 对话入口当前为占位状态；自然语言记录解析端点已经完成，但需要服务器配置 LLM Key 才会真正调用模型。
 - Agent 记忆当前由用户在本地手动管理，只有启用的记忆才预留给后续 AI 对话读取。
 - 热量和营养计算在 `utils/calculator.js` 中独立实现。
-- 后续接入远程 API 时，再把 profile、logs、weights 同步到服务端。
+- 备案前不自动同步 profile、logs、weights；完成备案、登录鉴权和隐私协议后，再把本地数据同步到服务端。

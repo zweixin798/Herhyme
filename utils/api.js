@@ -1,5 +1,13 @@
-// 本地调试时仍可通过 Storage 覆盖默认接口地址。
-const API_BASE_URL = wx.getStorageSync('herRhymeApiBaseUrl') || 'https://api.herhyme.site'
+function defaultApiBaseUrl() {
+  try {
+    const envVersion = wx.getAccountInfoSync().miniProgram.envVersion
+    if (envVersion === 'develop') return 'https://124.220.63.165'
+  } catch (error) {}
+  return 'https://api.herhyme.site'
+}
+
+// Storage 覆盖仅用于开发调试；体验版与正式版始终默认使用备案域名。
+const API_BASE_URL = wx.getStorageSync('herRhymeApiBaseUrl') || defaultApiBaseUrl()
 
 function getUserId() {
   let id = wx.getStorageSync('herRhymeUserId')

@@ -29,6 +29,16 @@
 .memory-editor .field-label:first-child { margin-top: 0; }
 .memory-textarea { background: #fffef9; border: 1rpx solid #ded9cc; border-radius: 16rpx; font-size: 27rpx; line-height: 1.55; min-height: 150rpx; padding: 20rpx; width: 100%; }
 .add-memory { margin-top: 22rpx; width: 100%; }
+.research-section { border-bottom: 1rpx solid #ded9cc; margin-bottom: 42rpx; padding-bottom: 42rpx; }
+.research-heading { align-items: flex-start; }
+.research-count { color: #777970; font-size: 22rpx; margin-top: 8rpx; }
+.research-mark { background: #e8ebdf; border-radius: 8rpx; color: #536750; font-size: 20rpx; padding: 8rpx 14rpx; }
+.consent-row { align-items: center; border-bottom: 1rpx solid #e3ded2; padding: 26rpx 0; }
+.consent-copy { max-width: 76%; }
+.consent-disabled { opacity: 0.55; }
+.research-note { color: #777970; font-size: 21rpx; line-height: 1.55; padding-top: 22rpx; }
+.export-button { margin-top: 24rpx; width: 100%; }
+.export-button[disabled] { opacity: 0.45; }
 .memory-row { border-bottom: 1rpx solid #e3ded2; padding: 28rpx 0; }
 .memory-title { font-size: 28rpx; font-weight: 650; }
 .memory-content { color: #5f625b; font-size: 25rpx; line-height: 1.6; margin-top: 14rpx; overflow-wrap: break-word; }

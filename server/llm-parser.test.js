@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict')
 const http = require('node:http')
 const test = require('node:test')
-const { PARSED_LOG_SCHEMA, parseRecordText, validateParsedLog } = require('./llm-parser')
+const { PARSED_LOG_SCHEMA, evaluateParsedLog, parseRecordText, validateParsedLog } = require('./llm-parser')
 
 test('schema requires a supported record type', () => {
   assert.deepEqual(PARSED_LOG_SCHEMA.parameters.required, ['type'])
@@ -13,6 +13,28 @@ test('validator rejects values outside product ranges', () => {
   assert.equal(validateParsedLog({ type: 'cycle', cycle: { pain_level: 11 } }).ok, false)
   assert.equal(validateParsedLog({ type: 'training', training: { duration_min: 1441 } }).ok, false)
   assert.equal(validateParsedLog({ type: 'diet', diet_items: [{ name: '鸡蛋', calories_est: -1 }] }).ok, false)
+  assert.equal(validateParsedLog({ type: 'mood', training: { activity: '跑步' } }).ok, false)
+  assert.equal(validateParsedLog({ type: 'sleep', sleep: {}, diagnosis: '失眠' }).ok, false)
+})
+
+test('deterministic rules flag missing details and high pain after model parsing', () => {
+  assert.deepEqual(evaluateParsedLog({ type: 'training', training: { activity: '跑步' } }).follow_up_fields, ['training.duration_min'])
+  assert.equal(evaluateParsedLog({ type: 'cycle', cycle: { pain_level: 8 } }).safety_level, 'attention')
+  assert.deepEqual(evaluateParsedLog({ type: 'sleep', sleep: { duration_min: 420 } }).flags, [])
+  const dietRules = evaluateParsedLog({ type: 'diet', diet_items: [{ name: '鸡蛋' }] })
+  assert.equal(dietRules.needs_follow_up, true)
+  assert.deepEqual(dietRules.follow_up_fields, ['diet_items.amount'])
+  assert.deepEqual(dietRules.flags, ['diet_estimates_missing'])
+  assert.equal(dietRules.safety_level, 'normal')
+})
+
+test('source-text safety rules do not depend on model extraction', () => {
+  const physical = evaluateParsedLog({ type: 'cycle', cycle: {} }, '流血不止，而且刚刚昏厥了')
+  const selfHarm = evaluateParsedLog({ type: 'mood', mood: 'low' }, '我现在有点想伤害自己')
+  assert.equal(physical.safety_level, 'urgent')
+  assert.ok(physical.flags.includes('urgent_physical_symptom_language'))
+  assert.equal(selfHarm.safety_level, 'urgent')
+  assert.ok(selfHarm.flags.includes('self_harm_language'))
 })
 
 test('parser forces the only function and returns validated arguments', async t => {

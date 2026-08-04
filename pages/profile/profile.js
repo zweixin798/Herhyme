@@ -1,9 +1,12 @@
 const { calculatePlan } = require('../../utils/calculator')
-const { request } = require('../../utils/api')
+const { buildResearchPackage } = require('../../utils/body-memory')
 
 const PROFILE_KEY = 'herRhymeProfile'
 const MEMORY_KEY = 'herRhymeAgentMemories'
 const MEMORY_INITIALIZED_KEY = 'herRhymeMemoryInitialized'
+const RESEARCH_CONSENT_KEY = 'herRhymeResearchConsent'
+const RAW_TEXT_CONSENT_KEY = 'herRhymeResearchRawTextConsent'
+const PARTICIPANT_ID_KEY = 'herRhymeResearchParticipantId'
 
 const EMPTY_FORM = {
   sex: 'female',
@@ -32,7 +35,11 @@ Page({
     memories: [],
     enabledMemoryCount: 0,
     showMemoryEditor: false,
-    memoryForm: { title: '', content: '' }
+    memoryForm: { title: '', content: '' },
+    researchConsent: false,
+    includeRawText: false,
+    researchParticipantId: '',
+    researchSummary: { records: 0, corrections: 0 }
   },
 
   onLoad(options) {
@@ -44,6 +51,7 @@ Page({
 
   onShow() {
     this.loadMemories()
+    this.loadResearchSettings()
   },
 
   loadData() {
@@ -124,6 +132,101 @@ Page({
     })
   },
 
+  loadResearchSettings() {
+    const logs = wx.getStorageSync('herRhymeLogs') || []
+    const feedback = wx.getStorageSync('herRhymeAgentFeedback') || []
+    this.setData({
+      researchConsent: Boolean(wx.getStorageSync(RESEARCH_CONSENT_KEY)),
+      includeRawText: Boolean(wx.getStorageSync(RAW_TEXT_CONSENT_KEY)),
+      researchParticipantId: wx.getStorageSync(PARTICIPANT_ID_KEY) || '',
+      researchSummary: {
+        records: logs.length,
+        corrections: feedback.filter(item => item.outcome === 'corrected').length
+      }
+    })
+  },
+
+  onResearchConsentChange(event) {
+    const enabled = Boolean(event.detail.value)
+    wx.setStorageSync(RESEARCH_CONSENT_KEY, enabled)
+    if (!enabled) {
+      wx.setStorageSync(RAW_TEXT_CONSENT_KEY, false)
+      this.setData({ researchConsent: false, includeRawText: false })
+      return
+    }
+    this.setData({ researchConsent: true })
+  },
+
+  onRawTextConsentChange(event) {
+    if (!this.data.researchConsent) {
+      this.setData({ includeRawText: false })
+      wx.showToast({ title: '请先允许导出研究数据', icon: 'none' })
+      return
+    }
+    const enabled = Boolean(event.detail.value)
+    wx.setStorageSync(RAW_TEXT_CONSENT_KEY, enabled)
+    this.setData({ includeRawText: enabled })
+  },
+
+  getResearchParticipantId() {
+    let id = wx.getStorageSync(PARTICIPANT_ID_KEY)
+    if (!id) {
+      id = `hr-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+      wx.setStorageSync(PARTICIPANT_ID_KEY, id)
+      this.setData({ researchParticipantId: id })
+    }
+    return id
+  },
+
+  exportResearchData() {
+    if (!this.data.researchConsent) {
+      wx.showToast({ title: '请先开启研究数据导出授权', icon: 'none' })
+      return
+    }
+    const participantId = this.getResearchParticipantId()
+    const researchPackage = buildResearchPackage({
+      participantId,
+      profile: wx.getStorageSync(PROFILE_KEY) || {},
+      plans: wx.getStorageSync('herRhymePlans') || [],
+      logs: wx.getStorageSync('herRhymeLogs') || [],
+      agentFeedback: wx.getStorageSync('herRhymeAgentFeedback') || []
+    }, { includeRawText: this.data.includeRawText })
+    const json = JSON.stringify(researchPackage, null, 2)
+    const filePath = `${wx.env.USER_DATA_PATH}/her-rhyme-${participantId}.json`
+    wx.getFileSystemManager().writeFile({
+      filePath,
+      data: json,
+      encoding: 'utf8',
+      success: () => this.shareResearchFile(filePath, json),
+      fail: () => wx.showToast({ title: '生成数据包失败，请稍后重试', icon: 'none' })
+    })
+  },
+
+  shareResearchFile(filePath, json) {
+    if (typeof wx.shareFileMessage !== 'function') {
+      this.copyResearchJson(json)
+      return
+    }
+    wx.shareFileMessage({
+      filePath,
+      fileName: 'Her-Rhyme-研究数据.json',
+      success: () => wx.showToast({ title: '数据包已生成', icon: 'success' }),
+      fail: () => this.copyResearchJson(json)
+    })
+  },
+
+  copyResearchJson(json) {
+    wx.setClipboardData({
+      data: json,
+      success: () => wx.showModal({
+        title: '数据已复制',
+        content: '当前环境无法直接分享文件，研究数据 JSON 已复制到剪贴板。',
+        showCancel: false
+      }),
+      fail: () => wx.showToast({ title: '导出失败，请在手机上重试', icon: 'none' })
+    })
+  },
+
   startEditing() {
     this.setData({ editing: true })
   },
@@ -158,7 +261,6 @@ Page({
     const profile = { ...form, plan, updatedAt: new Date().toISOString() }
     wx.setStorageSync(PROFILE_KEY, profile)
     this.initializeProfileMemory(profile)
-    request('/api/profile', 'POST', profile).catch(() => {})
     this.setData({ plan, hasProfile: true, editing: false })
     this.loadData()
     wx.showToast({ title: '档案已保存', icon: 'success' })
@@ -264,7 +366,7 @@ Page({
       confirmColor: '#9b4d46',
       success: result => {
         if (!result.confirm) return
-        const keys = ['herRhymeProfile', 'herRhymePlans', 'herRhymeLogs', 'herRhymeWeightLogs', 'herRhymePendingRecordType', 'herRhymeOnboarding', 'herRhymeUserId', MEMORY_KEY, MEMORY_INITIALIZED_KEY]
+        const keys = ['herRhymeProfile', 'herRhymePlans', 'herRhymeLogs', 'herRhymeWeightLogs', 'herRhymePendingRecordType', 'herRhymeOnboarding', 'herRhymeUserId', 'herRhymeAgentFeedback', MEMORY_KEY, MEMORY_INITIALIZED_KEY, RESEARCH_CONSENT_KEY, RAW_TEXT_CONSENT_KEY, PARTICIPANT_ID_KEY]
         keys.forEach(key => wx.removeStorageSync(key))
         wx.setStorageSync('herRhymePlans', [])
         wx.setStorageSync('herRhymeLogs', [])

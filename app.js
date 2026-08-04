@@ -9,7 +9,8 @@ App({
       herRhymeLogs: [],
       herRhymeWeightLogs: [],
       herRhymePlans: [],
-      herRhymeAgentMemories: []
+      herRhymeAgentMemories: [],
+      herRhymeAgentFeedback: []
     }
 
     Object.keys(defaults).forEach(key => {

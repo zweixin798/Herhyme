@@ -29,6 +29,7 @@
       <text class="parsed-type">{{parsed.typeLabel}}</text>
     </view>
     <view class="confirm-question">{{parsePreviewText}}</view>
+    <view wx:if="{{parseNoticeText}}" class="parse-notice">{{parseNoticeText}}</view>
 
     <view wx:if="{{parsed.type === 'diet'}}" class="parsed-fields">
       <view wx:for="{{parsed.diet_items}}" wx:key="index" class="diet-item">

@@ -100,6 +100,31 @@
   </view>
 
   <view class="data-section">
+    <view class="research-section">
+      <view class="row research-heading">
+        <view>
+          <view class="section-title">身体数据研究</view>
+          <view class="research-count">{{researchSummary.records}} 条记录 · {{researchSummary.corrections}} 次识别修正</view>
+        </view>
+        <view class="research-mark">去标识</view>
+      </view>
+      <view class="consent-row row">
+        <view class="consent-copy">
+          <view class="action-title">允许导出研究数据</view>
+          <view class="action-note">包含身体档案、结构化记录、计划和识别反馈</view>
+        </view>
+        <switch checked="{{researchConsent}}" color="#536750" bindchange="onResearchConsentChange" />
+      </view>
+      <view class="consent-row row {{!researchConsent ? 'consent-disabled' : ''}}">
+        <view class="consent-copy">
+          <view class="action-title">同时包含记录原文</view>
+          <view class="action-note">可能包含私密描述，默认关闭</view>
+        </view>
+        <switch checked="{{includeRawText}}" disabled="{{!researchConsent}}" color="#536750" bindchange="onRawTextConsentChange" />
+      </view>
+      <view class="research-note">研究数据只在你主动导出后共享。AI 识别会临时发送当前一条文字，但不会自动归档到云端；研究编号不包含微信身份信息。</view>
+      <button class="button-secondary export-button" disabled="{{!researchConsent}}" bindtap="exportResearchData">生成并分享研究数据包</button>
+    </view>
     <view class="section-title">数据管理</view>
     <view class="data-action" bindtap="deleteProfile">
       <view><view class="action-title">删除个人档案</view><view class="action-note">保留日常记录和计划</view></view>

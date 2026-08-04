@@ -43,6 +43,13 @@ Page({
     parseError: '',
     parsed: null,
     parsePreviewText: '',
+    parseNoticeText: '',
+    parseEdited: false,
+    originalParsed: null,
+    parserRules: null,
+    promptVersion: '',
+    ruleVersion: '',
+    pendingLogId: '',
     moodIndex: 0,
     flowIndex: 0,
     counts: { diet: 0, training: 0, sleep: 0, cycle: 0, mood: 0 },
@@ -59,11 +66,19 @@ Page({
   },
 
   onMessageInput(event) {
+    const value = event.detail.value
     this.setData({
-      message: event.detail.value,
+      message: value,
       saved: false,
       parsed: null,
       parsePreviewText: '',
+      parseNoticeText: this.localSafetyNotice(value),
+      parseEdited: false,
+      originalParsed: null,
+      parserRules: null,
+      promptVersion: '',
+      ruleVersion: '',
+      pendingLogId: '',
       parseError: ''
     })
   },
@@ -177,16 +192,34 @@ Page({
     }
     if (this.data.parsing) return
 
-    this.setData({ parsing: true, parseError: '', parsed: null, parsePreviewText: '', saved: false })
+    this.setData({
+      parsing: true,
+      parseError: '',
+      parsed: null,
+      parsePreviewText: '',
+      parseNoticeText: this.localSafetyNotice(content),
+      parseEdited: false,
+      originalParsed: null,
+      parserRules: null,
+      promptVersion: '',
+      ruleVersion: '',
+      pendingLogId: `log-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      saved: false
+    })
     request('/api/logs/parse', 'POST', { content })
       .then(payload => {
         const parsed = this.normalizeParsed(payload.parsed)
         this.setData({
           parsing: false,
           parsed,
+          originalParsed: JSON.parse(JSON.stringify(payload.parsed || {})),
+          parserRules: payload.rules || null,
+          promptVersion: payload.prompt_version || 'record_parser_unknown',
+          ruleVersion: payload.rule_version || payload.rules?.rule_version || 'record_rules_unknown',
           moodIndex: Math.max(0, MOOD_VALUES.indexOf(parsed.mood)),
           flowIndex: Math.max(0, FLOW_VALUES.indexOf(parsed.cycle?.flow)),
-          parsePreviewText: this.describeParsed(parsed)
+          parsePreviewText: this.describeParsed(parsed),
+          parseNoticeText: this.describeRules(payload.rules) || this.localSafetyNotice(content)
         })
       })
       .catch(error => {
@@ -242,6 +275,49 @@ Page({
       return `识别到：睡眠 ${duration}${parsed.sleep?.quality ? `，质量 ${parsed.sleep.quality}` : ''}，对吗？`
     }
     return '识别到一条其他身体记录，对吗？'
+  },
+
+  describeRules(rules) {
+    if (!rules) return ''
+    if (rules.flags?.includes('self_harm_language')) {
+      return '如果你现在可能伤害自己，请立即联系当地紧急服务，并尽快让一位可信赖的人陪在你身边。'
+    }
+    if (rules.flags?.includes('urgent_physical_symptom_language')) {
+      return '这条描述可能需要立即关注。如果你正在经历昏厥、呼吸困难、胸痛或无法控制的出血，请立即联系当地急救服务或就近就医。'
+    }
+    if (rules.flags?.includes('high_pain_reported')) {
+      return '识别到较高疼痛程度。记录可以继续保存；如果疼痛持续、加重或伴随其他严重不适，请及时寻求专业帮助。'
+    }
+    if (rules.flags?.includes('very_short_sleep_reported')) {
+      return '睡眠时长明显偏短，请确认识别结果是否准确。'
+    }
+    if (rules.flags?.includes('verify_long_training_duration')) {
+      return '训练时长较长，请确认分钟数是否准确。'
+    }
+    if (rules.flags?.includes('diet_estimates_missing')) {
+      return '这次没有可靠的营养估算，可以补充份量或手动填写后再保存。'
+    }
+    const labels = {
+      diet_items: '具体食物',
+      'diet_items.amount': '食物份量',
+      mood: '心情状态',
+      'training.activity': '训练项目',
+      'training.duration_min': '训练时长',
+      'cycle.details': '周期或症状信息',
+      'sleep.details': '睡眠时长或质量'
+    }
+    const missing = (rules.follow_up_fields || []).map(field => labels[field] || field)
+    return missing.length ? `还可以补充${missing.join('、')}，也可以先按当前结果保存。` : ''
+  },
+
+  localSafetyNotice(text) {
+    if (/(不想活|想死|自杀|伤害自己|自残)/i.test(text)) {
+      return '如果你现在可能伤害自己，请立即联系当地紧急服务，并尽快让一位可信赖的人陪在你身边。'
+    }
+    if (/(晕厥|昏厥|失去意识|呼吸困难|胸痛|流血不止|止不住血|一小时.{0,8}(卫生巾|卫生棉|棉条))/i.test(text)) {
+      return '这条描述可能需要立即关注。如果你正在经历昏厥、呼吸困难、胸痛或无法控制的出血，请立即联系当地急救服务或就近就医。'
+    }
+    return ''
   },
 
   moodLabel(value) {
@@ -303,7 +379,10 @@ Page({
   },
 
   refreshParsedPreview() {
-    this.setData({ parsePreviewText: this.describeParsed(this.data.parsed) })
+    this.setData({
+      parsePreviewText: this.describeParsed(this.data.parsed),
+      parseEdited: true
+    })
   },
 
   cleanParsedForSave() {
@@ -350,6 +429,7 @@ Page({
       wx.showToast({ title: validationError, icon: 'none' })
       return
     }
+    this.recordParserFeedback(parsed, this.data.parseEdited ? 'corrected' : 'accepted')
     this.persistLog(parsed)
   },
 
@@ -367,13 +447,31 @@ Page({
 
   saveWithoutParsing() {
     if (!this.data.message.trim()) return
+    this.recordParserFeedback(null, 'saved_without_parsing')
     this.persistLog(null)
+  },
+
+  recordParserFeedback(finalParsed, outcome) {
+    const feedback = wx.getStorageSync('herRhymeAgentFeedback') || []
+    feedback.unshift({
+      id: `feedback-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      source_log_id: this.data.pendingLogId || '',
+      agent_id: 'record_parser',
+      prompt_version: this.data.promptVersion || 'record_parser_unavailable',
+      rule_version: this.data.ruleVersion || 'record_rules_unavailable',
+      outcome,
+      original_parsed: this.data.originalParsed || null,
+      final_parsed: finalParsed || null,
+      rules: this.data.parserRules || null,
+      created_at: new Date().toISOString()
+    })
+    wx.setStorageSync('herRhymeAgentFeedback', feedback.slice(0, 200))
   },
 
   persistLog(parsed) {
     const content = this.data.message.trim()
     const log = {
-      id: `log-${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      id: this.data.pendingLogId || `log-${Date.now()}-${Math.random().toString(16).slice(2)}`,
       type: parsed?.type || 'general',
       content,
       summary: parsed ? this.describeParsed(parsed).replace('，对吗？', '') : content.slice(0, 12),
@@ -384,8 +482,21 @@ Page({
     const logs = wx.getStorageSync('herRhymeLogs') || []
     logs.unshift(log)
     wx.setStorageSync('herRhymeLogs', logs)
-    request('/api/logs', 'POST', log).catch(() => {})
-    this.setData({ saved: true, message: '', parsing: false, parseError: '', parsed: null, parsePreviewText: '' })
+    this.setData({
+      saved: true,
+      message: '',
+      parsing: false,
+      parseError: '',
+      parsed: null,
+      originalParsed: null,
+      parserRules: null,
+      parseEdited: false,
+      promptVersion: '',
+      ruleVersion: '',
+      pendingLogId: '',
+      parsePreviewText: '',
+      parseNoticeText: ''
+    })
     this.loadLogs()
     wx.showToast({ title: '已保存', icon: 'success' })
   },

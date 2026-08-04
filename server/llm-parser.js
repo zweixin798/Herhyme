@@ -5,6 +5,15 @@ const PARSED_TYPES = ['diet', 'mood', 'training', 'cycle', 'sleep']
 const MOODS = ['happy', 'calm', 'tired', 'stressed', 'low']
 const FLOWS = ['light', 'medium', 'heavy']
 const SLEEP_QUALITIES = ['poor', 'fair', 'good']
+const PROMPT_VERSION = 'record_parser_v3_2026_08_04'
+const RULE_VERSION = 'record_rules_v1_2026_08_04'
+const TYPE_FIELD = {
+  diet: 'diet_items',
+  mood: 'mood',
+  training: 'training',
+  cycle: 'cycle',
+  sleep: 'sleep'
+}
 
 // The sleep branch keeps the parser aligned with the five record categories already in the mini program.
 const PARSED_LOG_SCHEMA = {
@@ -188,6 +197,16 @@ function validateParsedLog(input) {
   const value = {}
   if (type) value.type = type
 
+  const domainFields = Object.values(TYPE_FIELD)
+  domainFields.forEach(field => {
+    if (input[field] !== undefined && type && field !== TYPE_FIELD[type]) {
+      addError(errors, field, `does not match type ${type}`)
+    }
+  })
+  Object.keys(input).forEach(field => {
+    if (field !== 'type' && !domainFields.includes(field)) addError(errors, field, 'is not allowed')
+  })
+
   if (input.diet_items !== undefined && input.diet_items !== null) {
     if (!Array.isArray(input.diet_items)) {
       addError(errors, 'diet_items', 'must be an array')
@@ -265,6 +284,51 @@ function validateParsedLog(input) {
   return { ok: errors.length === 0, value, errors }
 }
 
+function evaluateParsedLog(parsed, sourceText = '') {
+  const followUpFields = []
+  const flags = []
+  const text = String(sourceText || '')
+
+  if (/(晕厥|昏厥|失去意识|呼吸困难|胸痛|流血不止|止不住血|一小时.{0,8}(卫生巾|卫生棉|棉条))/i.test(text)) {
+    flags.push('urgent_physical_symptom_language')
+  }
+  if (/(不想活|想死|自杀|伤害自己|自残)/i.test(text)) flags.push('self_harm_language')
+
+  if (parsed.type === 'diet') {
+    const items = parsed.diet_items || []
+    if (!items.length) followUpFields.push('diet_items')
+    if (items.some(item => !item.amount)) followUpFields.push('diet_items.amount')
+    if (items.length && items.every(item => item.calories_est === undefined && item.protein_est === undefined)) {
+      flags.push('diet_estimates_missing')
+    }
+  }
+  if (parsed.type === 'mood' && !parsed.mood) followUpFields.push('mood')
+  if (parsed.type === 'training') {
+    if (!parsed.training?.activity) followUpFields.push('training.activity')
+    if (parsed.training?.duration_min === undefined) followUpFields.push('training.duration_min')
+    if (parsed.training?.duration_min > 300) flags.push('verify_long_training_duration')
+  }
+  if (parsed.type === 'cycle') {
+    const cycle = parsed.cycle || {}
+    if (!Object.keys(cycle).length) followUpFields.push('cycle.details')
+    if (cycle.pain_level >= 8) flags.push('high_pain_reported')
+  }
+  if (parsed.type === 'sleep') {
+    if (parsed.sleep?.duration_min === undefined && !parsed.sleep?.quality) followUpFields.push('sleep.details')
+    if (parsed.sleep?.duration_min !== undefined && parsed.sleep.duration_min < 180) flags.push('very_short_sleep_reported')
+  }
+
+  return {
+    needs_follow_up: followUpFields.length > 0,
+    follow_up_fields: followUpFields,
+    flags,
+    safety_level: flags.includes('urgent_physical_symptom_language') || flags.includes('self_harm_language')
+      ? 'urgent'
+      : flags.includes('high_pain_reported') ? 'attention' : 'normal',
+    rule_version: RULE_VERSION
+  }
+}
+
 function extractToolArguments(response) {
   const message = response?.choices?.[0]?.message || {}
   const toolCalls = message.tool_calls || []
@@ -296,9 +360,11 @@ async function parseRecordText(text, env = process.env) {
         role: 'system',
         content: [
           '你是 Her Rhyme 的身体记录解析器。每次响应都必须调用 save_parsed_log，禁止输出普通文本，禁止向用户追问。',
-          '只提取用户明确说出的信息；信息不足时省略对应字段，不要补造时长、周期天数或疼痛等级。',
-          '如果一句话包含多个意图，只选择最主要、最具体的身体信号作为 type，并仍然调用函数。',
-          '食物热量和蛋白质可以做保守的近似估算，用户会在保存前确认和修改。'
+          '除食物营养估算外，只提取用户明确说出的信息；信息不足时省略对应字段，不要补造时长、周期天数或疼痛等级。',
+          '如果一句话包含多个意图，只选择最主要、最具体且最需要归档的身体信号作为 type；其他信号不得编造成该类型字段。',
+          '不要诊断疾病，不要根据周期阶段推断用户必然具备某种症状，也不要生成训练或医疗建议。',
+          '食物和份量明确时，尽量填写每项 calories_est 与 protein_est，并使用常见食物的保守近似值；菜品或份量不明确时可以省略，禁止伪装成精确测量。',
+          `提示词版本：${PROMPT_VERSION}`
         ].join('\n')
       },
       { role: 'user', content: text.trim() }
@@ -312,12 +378,22 @@ async function parseRecordText(text, env = process.env) {
   const candidate = extractToolArguments(response)
   const result = validateParsedLog(candidate)
   if (!result.ok) throw new ParserError('LLM returned fields outside the allowed ranges', 422, 'llm_invalid_output', { errors: result.errors })
-  return { parsed: result.value, provider: config.provider, model: config.model }
+  return {
+    parsed: result.value,
+    rules: evaluateParsedLog(result.value, text),
+    promptVersion: PROMPT_VERSION,
+    ruleVersion: RULE_VERSION,
+    provider: config.provider,
+    model: config.model
+  }
 }
 
 module.exports = {
   PARSED_LOG_SCHEMA,
+  PROMPT_VERSION,
+  RULE_VERSION,
   ParserError,
+  evaluateParsedLog,
   getLlmConfig,
   parseRecordText,
   validateParsedLog

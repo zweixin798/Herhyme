@@ -103,7 +103,15 @@ async function handler(req, res) {
     if (req.method === 'POST' && url.pathname === '/api/logs/parse') {
       checkParseRateLimit(req)
       const result = await parseRecordText(body.content || body.text)
-      return send(res, 200, { ok: true, parsed: result.parsed, provider: result.provider, model: result.model })
+      return send(res, 200, {
+        ok: true,
+        parsed: result.parsed,
+        rules: result.rules,
+        prompt_version: result.promptVersion,
+        rule_version: result.ruleVersion,
+        provider: result.provider,
+        model: result.model
+      })
     }
 
     if (req.method === 'POST' && url.pathname === '/api/profile') {
